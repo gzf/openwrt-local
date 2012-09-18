@@ -1,0 +1,21 @@
+Index: trunk/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
+===================================================================
+--- trunk.orig/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
++++ trunk/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
+@@ -24,6 +24,7 @@
+ #include "dev-leds-gpio.h"
+ #include "dev-m25p80.h"
+ #include "dev-spi.h"
++#include "dev-usb.h"
+ #include "dev-wmac.h"
+ #include "machtypes.h"
+ 
+@@ -148,6 +149,8 @@
+ 	ath79_eth0_data.mii_bus_dev = &ath79_mdio0_device.dev;
+ 	ath79_eth0_pll_data.pll_1000 = 0x06000000;
+ 	ath79_register_eth(0);
++
++	ath79_register_usb();
+ }
+ 
+ MIPS_MACHINE(ATH79_MACH_TL_WR1041N_V2, "TL-WR1041N-v2",

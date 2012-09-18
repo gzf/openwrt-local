@@ -1,0 +1,95 @@
+Index: trunk/feeds/packages/utils/vim/Makefile
+===================================================================
+--- trunk.orig/feeds/packages/utils/vim/Makefile
++++ trunk/feeds/packages/utils/vim/Makefile
+@@ -35,6 +35,11 @@
+   TITLE+= (Tiny)
+ endef
+ 
++define Package/vim-small
++  $(call Package/vim/Default)
++  TITLE+= (Small)
++endef
++
+ define Package/vim-full
+   $(call Package/vim/Default)
+   TITLE+= (Normal)
+@@ -61,6 +66,10 @@
+ /usr/share/vim/vimrc
+ endef
+ 
++define Package/vim-small/conffiles
++/usr/share/vim/vimrc
++endef
++
+ define Package/vim/conffiles
+ /usr/share/vim/vimrc
+ endef
+@@ -70,6 +79,11 @@
+  (Tiny build)
+ endef
+ 
++define Package/vim-small/description
++ Vim is an almost compatible version of the UNIX editor Vi.
++ (Small build)
++endef
++
+ define Package/vim-full/description
+  Vim is an almost compatible version of the UNIX editor Vi.
+  (Normal build)
+@@ -123,6 +137,19 @@
+ endef
+ endif
+ 
++ifneq ($(CONFIG_PACKAGE_vim-small),)
++define Build/Compile/vim-small
++	$(call Build/Configure/Default, \
++		--with-features=small \
++		--enable-multibyte \
++	)
++	$(MAKE) -C $(PKG_BUILD_DIR) clean
++	$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
++		DESTDIR="$(PKG_INSTALL_DIR)" all
++	$(CP) $(PKG_BUILD_DIR)/src/$(PKG_NAME) $(PKG_BUILD_DIR)/vim_small
++endef
++endif
++
+ ifneq ($(CONFIG_PACKAGE_vim-full),)
+ define Build/Compile/vim-full
+ 	$(call Build/Configure/Default, \
+@@ -152,6 +179,7 @@
+ 
+ define Build/Compile
+ $(call Build/Compile/vim)
++$(call Build/Compile/vim-small)
+ $(call Build/Compile/vim-full)
+ $(call Build/Compile/vim-runtime)
+ $(call Build/Compile/xxd)
+@@ -164,6 +192,13 @@
+ 	$(INSTALL_CONF) ./files/vimrc $(1)/usr/share/vim/
+ endef
+ 
++define Package/vim-small/install
++	$(INSTALL_DIR) $(1)/usr/bin
++	$(INSTALL_BIN) $(PKG_BUILD_DIR)/vim_small $(1)/usr/bin/vim
++	$(INSTALL_DIR) $(1)/usr/share/vim
++	$(INSTALL_CONF) ./files/vimrc.small $(1)/usr/share/vim/vimrc
++endef
++
+ define Package/vim-full/install
+ 	$(INSTALL_DIR) $(1)/usr/bin
+ 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/vim_normal $(1)/usr/bin/vim
+@@ -186,6 +221,7 @@
+ endef
+ 
+ $(eval $(call BuildPackage,vim))
++$(eval $(call BuildPackage,vim-small))
+ $(eval $(call BuildPackage,vim-full))
+ $(eval $(call BuildPackage,vim-runtime))
+ $(eval $(call BuildPackage,vim-help))
+Index: trunk/feeds/packages/utils/vim/files/vimrc.small
+===================================================================
+--- /dev/null
++++ trunk/feeds/packages/utils/vim/files/vimrc.small
+@@ -0,0 +1 @@
++set encoding=utf-8
