@@ -1,0 +1,51 @@
+Index: openwrt/target/linux/ar71xx/base-files/lib/ar71xx.sh
+===================================================================
+--- openwrt.orig/target/linux/ar71xx/base-files/lib/ar71xx.sh
++++ openwrt/target/linux/ar71xx/base-files/lib/ar71xx.sh
+@@ -132,6 +132,9 @@
+ 	"431000"*)
+ 		model="TP-Link TL-WDR4310"
+ 		;;
++	"453000"*)
++		model="Mercury MW4530R"
++		;;
+ 	*)
+ 		hwver=""
+ 		;;
+Index: openwrt/target/linux/ar71xx/generic/profiles/mercury.mk
+===================================================================
+--- /dev/null
++++ openwrt/target/linux/ar71xx/generic/profiles/mercury.mk
+@@ -0,0 +1,19 @@
++#
++# Copyright (C) 2009 OpenWrt.org
++#
++# This is free software, licensed under the GNU General Public License v2.
++# See /LICENSE for more information.
++#
++# routers from Mercury (a sub-company of TP-LINK)
++
++
++define Profile/MCMW4530R
++	NAME:=Mercury MW4530R
++	PACKAGES:=
++endef
++
++define Profile/MCMW4530R/Description
++	Package set optimized for the Mercury MW4530R.
++endef
++$(eval $(call Profile,MCMW4530R))
++
+Index: openwrt/target/linux/ar71xx/image/Makefile
+===================================================================
+--- openwrt.orig/target/linux/ar71xx/image/Makefile
++++ openwrt/target/linux/ar71xx/image/Makefile
+@@ -831,6 +831,8 @@
+ $(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),TLWDR4300V1,tl-wdr4300-v1,TL-WDR4300,ttyS0,115200,0x43000001,1,8Mlzma))
+ $(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),TLWDR4310V1,tl-wdr4310-v1,TL-WDR4300,ttyS0,115200,0x43100001,1,8Mlzma))
+ 
++$(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),MCMW4530R,mc-mw4530r,TL-WDR4300,ttyS0,115200,0x45300001,1,8Mlzma))
++
+ $(eval $(call SingleProfile,UBNT,$(fs_64k),UBNTRS,ubnt-rs,UBNT-RS,ttyS0,115200,RS,RSx,ar7100))
+ $(eval $(call SingleProfile,UBNT,$(fs_64k),UBNTRSPRO,ubnt-rspro,UBNT-RSPRO,ttyS0,115200,RSPRO,RSPRO,ar7100pro))
+ $(eval $(call SingleProfile,UBNT,$(fs_64k),UBNTLSSR71,ubnt-ls-sr71,UBNT-LS-SR71,ttyS0,115200,LS-SR71,LS-SR71,ar7100))
