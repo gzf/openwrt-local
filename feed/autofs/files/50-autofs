@@ -1,0 +1,13 @@
+#!/bin/sh
+# Author: Zhifeng Gu <guzhifeng1979@hotmail.com>
+# Date: 2012/03
+# License: GPL
+
+blkdev=`dirname $DEVPATH`
+
+if [ `basename $blkdev` != "block" ]; then
+    . /lib/functions/autofs.sh
+    if is_running; then
+        reload_config
+    fi
+fi

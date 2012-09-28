@@ -1,0 +1,80 @@
+#!/bin/sh /etc/rc.common
+#
+# Author: Zhifeng Gu <guzhifeng1979@hotmail.com>
+# Date: 2012/03
+# License: GPL
+
+START=21
+STOP=98
+
+MASTER_FILE=/tmp/auto.master
+
+. /lib/functions/autofs.sh
+
+create_map_entry() {
+    local cfg="$1"
+    local entry type maptype mountpoint map timeout
+
+    config_get type "$cfg" type
+    case "$type" in
+        direct)
+            mountpoint=/-
+            ;;
+        indirect)
+            config_get mountpoint "$cfg" mountpoint
+            ;;
+        *)
+            logger -t "autofs" "unknown map type: $type"
+            return
+    esac
+
+    config_get maptype "$cfg" maptype
+    config_get map "$cfg" map
+
+    entry="$mountpoint\t\t$maptype:$map"
+
+    config_get timeout "$cfg" timeout
+    if [ -n "$timeout" ]; then
+        entry="$entry\t\t-DTIMEOUT=$timeout"
+    fi
+
+    echo -e $entry >> $MASTER_FILE
+}
+
+start_daemon() {
+    local timeout
+
+    . /etc/functions.sh
+
+    config_load autofs
+    config_get timeout global timeout 600
+    echo "# Auto generated map entries, please modify /etc/config/autofs." > $MASTER_FILE
+    config_foreach create_map_entry mapentry
+
+    automount -p $AUTOMOUNT_PIDFILE -t $timeout
+}
+
+start() {
+    if is_running; then
+        logger -t "autofs" "automount is already running"
+        return
+    fi
+    start_daemon
+}
+
+stop() {
+    if ! is_running; then
+        return
+    fi
+    kill -TERM `cat $AUTOMOUNT_PIDFILE`
+    rm -f $AUTOMOUNT_PIDFILE
+    echo "# Autofs is stopped" > $MASTER_FILE
+}
+
+restart() {
+    if is_running; then
+        reload_config
+    else
+        start_daemon
+    fi
+}

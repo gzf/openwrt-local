@@ -1,0 +1,46 @@
+--- a/lib/defaults.c	2011-06-28 15:34:35.000000000 +0800
++++ b/lib/defaults.c	2012-02-28 16:46:53.000000000 +0800
+@@ -19,7 +19,9 @@
+ 
+ #include "list.h"
+ #include "defaults.h"
++#ifdef WITH_LDAP
+ #include "lookup_ldap.h"
++#endif
+ #include "log.h"
+ #include "automount.h"
+ 
+@@ -197,6 +199,8 @@
+ 	return 1;
+ }
+ 
++#ifdef WITH_LDAP
++
+ void defaults_free_uris(struct list_head *list)
+ {
+ 	struct list_head *next;
+@@ -290,6 +294,8 @@
+ 	return list;
+ }
+ 
++#endif
++
+ /*
+  * Read config env variables and check they have been set.
+  *
+@@ -428,6 +434,7 @@
+ 	return logging;
+ }
+ 
++#ifdef WITH_LDAP
+ unsigned int defaults_get_ldap_timeout(void)
+ {
+ 	int res;
+@@ -645,6 +652,7 @@
+ 
+ 	return schema;
+ }
++#endif
+ 
+ unsigned int defaults_get_mount_nfs_default_proto(void)
+ {

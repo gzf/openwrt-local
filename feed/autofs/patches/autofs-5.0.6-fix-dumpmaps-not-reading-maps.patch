@@ -1,0 +1,43 @@
+autofs-5.0.6 - fix dumpmaps not reading maps
+
+From: Ian Kent <raven@themaw.net>
+
+The lookup modules won't read any indirect map entries (other than those
+in a file map) unless unless the browse option is set. In order to list
+the entries when tyhe dumpmap option is given the browse option needs to
+be set.
+---
+
+ CHANGELOG    |    1 +
+ lib/master.c |    9 +++++++++
+ 2 files changed, 10 insertions(+)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -64,6 +64,7 @@
+ - check each dc server individually.
+ - replace GPLv3 with GPLv2 code for SRV record handling.
+ - fix paged query more results check.
++- fix dumpmaps not reading maps.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/lib/master.c
++++ autofs-5.0.5/lib/master.c
+@@ -1275,6 +1275,15 @@ int master_show_mounts(struct master *ma
+ 		printf("\nMount point: %s\n", ap->path);
+ 		printf("\nsource(s):\n");
+ 
++		/*
++		 * Ensure we actually read indirect map entries so we can
++		 * list them. The map reads won't read any indirect map
++		 * entries (other than those in a file map) unless the
++		 * browse option is set.
++		 */
++		if (ap->type == LKP_INDIRECT)
++			ap->flags |= MOUNT_FLAG_GHOST;
++
+ 		/* Read the map content into the cache */
+ 		if (lookup_nss_read_map(ap, NULL, now))
+ 			lookup_prune_cache(ap, now);

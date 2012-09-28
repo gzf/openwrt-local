@@ -1,0 +1,95 @@
+autofs-5.0.6 - code analysis fixes 1
+
+From: Ian Kent <ikent@redhat.com>
+
+Code analysis defect fixes, installment 1.
+
+- fix signed usage of unsigned variable in do_srv_query().
+- make NULL check handling of variable dcs explicit in get_dc_list().
+  - adding an explicit NULL check for variable dcs gaurds against
+    future changes in get_srv_rrs() returning success while not
+    clearing the dcs variable.
+  - makes it explict for readers why we don't need to check for NULL
+    before free later in the loop.
+- fix typo in do_reconnect()
+  - uri is never set now and, at this point, we need to try to connect
+    to the last server uri (ctxt->uri->uri) which is set in find_server()
+    when ctxt->uri is NULL.
+---
+
+ CHANGELOG             |    1 +
+ modules/dclist.c      |   11 +++++------
+ modules/lookup_ldap.c |    3 +--
+ 3 files changed, 7 insertions(+), 8 deletions(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -66,6 +66,7 @@
+ - fix paged query more results check.
+ - fix dumpmaps not reading maps.
+ - improve mount location error reporting.
++- code analysis defect fixes, installment 1.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/modules/dclist.c
++++ autofs-5.0.5/modules/dclist.c
+@@ -69,7 +69,7 @@ static void dclist_mutex_unlock(void)
+ 
+ static int do_srv_query(unsigned int logopt, char *name, u_char **packet)
+ {
+-	unsigned int len = PACKETSZ;
++	int len = PACKETSZ;
+ 	unsigned int last_len = len;
+ 	char ebuf[MAX_ERR_BUF];
+ 	u_char *buf;
+@@ -500,7 +500,8 @@ struct dclist *get_dc_list(unsigned int 
+ 		}
+ 
+ 		dclist_mutex_lock();
+-		if (!get_srv_rrs(logopt, request, &dcs, &numdcs)) {
++		ret = get_srv_rrs(logopt, request, &dcs, &numdcs);
++		if (!ret | !dcs) {
+ 			error(logopt,
+ 			      "DNS SRV query failed for domain %s", domain);
+ 			dclist_mutex_unlock();
+@@ -526,8 +527,7 @@ struct dclist *get_dc_list(unsigned int 
+ 		if (!tmp) {
+ 			char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+ 			error(logopt, "realloc: %s", estr);
+-			if (dcs)
+-				free_srv_rrs(dcs, numdcs);
++			free_srv_rrs(dcs, numdcs);
+ 			goto out_error;
+ 		}
+ 
+@@ -548,8 +548,7 @@ struct dclist *get_dc_list(unsigned int 
+ 				if (ret > 6) {
+ 					error(logopt,
+ 					      "invalid port: %u", dcs[i].port);
+-					if (dcs)
+-						free_srv_rrs(dcs, numdcs);
++					free_srv_rrs(dcs, numdcs);
+ 					goto out_error;
+ 				}
+ 				strcat(tmp, port);
+--- autofs-5.0.5.orig/modules/lookup_ldap.c
++++ autofs-5.0.5/modules/lookup_ldap.c
+@@ -734,7 +734,6 @@ static LDAP *find_server(unsigned logopt
+ static LDAP *do_reconnect(unsigned logopt, struct lookup_context *ctxt)
+ {
+ 	LDAP *ldap = NULL;
+-	char *uri;
+ 
+ 	if (ctxt->server || !ctxt->uris) {
+ 		ldap = do_connect(logopt, ctxt->server, ctxt);
+@@ -778,7 +777,7 @@ static LDAP *do_reconnect(unsigned logop
+ 	 */
+ 	if (!ldap) {
+ 		autofs_sasl_dispose(ctxt);
+-		ldap = connect_to_server(logopt, uri, ctxt);
++		ldap = connect_to_server(logopt, ctxt->uri->uri, ctxt);
+ 	}
+ #endif
+ 	if (ldap)

@@ -1,0 +1,36 @@
+autofs-5.0.5 - fix null cache clean
+
+From: Ian Kent <raven@themaw.net>
+
+A function to clean the null map entry cache was added to
+avoid a race when re-reading the master map. That function
+mistakenly fails to clear the hash bucket array entries
+which leads to a segmentation fault on the next null cache
+lookup.
+---
+
+ CHANGELOG   |    1 +
+ lib/cache.c |    1 +
+ 2 files changed, 2 insertions(+)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -47,6 +47,7 @@
+ - remove ERR_remove_state() openssl call.
+ - fix next task list update.
+ - fix stale map read.
++- fix null cache clean.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/lib/cache.c
++++ autofs-5.0.5/lib/cache.c
+@@ -249,6 +249,7 @@ void cache_clean_null_cache(struct mapen
+ 			free(me->key);
+ 			free(me);
+ 		}
++		mc->hash[i] = NULL;
+ 	}
+ 
+ 	return;

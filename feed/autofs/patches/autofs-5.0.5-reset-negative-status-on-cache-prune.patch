@@ -1,0 +1,38 @@
+autofs-5.0.5 - reset negative status on cache prune
+
+From: Ian Kent <raven@themaw.net>
+
+When we prune the cache we should reset time of last fail for valid map
+entries so that, on a HUP signal, we force an entry update on next mount
+attempt.
+---
+
+ CHANGELOG       |    1 +
+ daemon/lookup.c |    5 +++++
+ 2 files changed, 6 insertions(+)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -56,6 +56,7 @@
+ - fix paged ldap map read.
+ - add base64 password encode.
+ - add option to dump configured automount maps.
++- reset negative status on cache prune.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/daemon/lookup.c
++++ autofs-5.0.5/daemon/lookup.c
+@@ -1025,6 +1025,11 @@ void lookup_prune_one_cache(struct autof
+ 		char *key = NULL, *next_key = NULL;
+ 
+ 		if (me->age >= age) {
++			/*
++			 * Reset time of last fail for valid map entries to
++			 * force entry update and subsequent mount retry.
++			 */
++			me->status = 0;
+ 			me = cache_enumerate(mc, me);
+ 			continue;
+ 		}

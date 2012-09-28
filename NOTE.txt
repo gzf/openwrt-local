@@ -3,10 +3,6 @@ Working Revision: svn://svn.openwrt.org/openwrt/trunk/@33366
 config:
     - firewall
 
-    * kmod-usb2
-    * kmod-usb-ohci
-	* kmod-ledtrig-usbdev
-
     y kmod-usb-serial-option
     y comgt
     y usb-modeswitch
@@ -16,6 +12,7 @@ config:
     m autofs5
     m autofs5-mount-ext2
     m ez-ipupdate-3322
+    m openldap-server
     m rsync
     m vim-small
     m git

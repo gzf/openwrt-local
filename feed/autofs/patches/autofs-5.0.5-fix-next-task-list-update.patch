@@ -1,0 +1,44 @@
+autofs-5.0.5 - fix next task list update
+
+From: Ian Kent <raven@themaw.net>
+
+When the state queue task manager transfered an automount point pending
+task to its task queue for execution the state queue as mistakenly being
+seen as empty when the completing task was the only task in the state
+queue.
+---
+
+ CHANGELOG      |    1 +
+ daemon/state.c |    8 +++++---
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -45,6 +45,7 @@
+ - mount using address for DNS round robin host names.
+ - fix direct map not updating on reread.
+ - remove ERR_remove_state() openssl call.
++- fix next task list update.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/daemon/state.c
++++ autofs-5.0.5/daemon/state.c
+@@ -1150,11 +1150,13 @@ remove:
+ 				next = list_entry((&task->pending)->next,
+ 							struct state_queue, pending);
+ 
+-				list_del_init(&next->pending);
+-				list_add_tail(&next->list, p);
+-
+ 				list_del(&task->list);
+ 				free(task);
++
++				list_del_init(&next->pending);
++				list_add_tail(&next->list, head);
++				if (p == head)
++					p = head->next;
+ 			}
+ 
+ 			if (list_empty(head))

@@ -1,0 +1,64 @@
+autofs-5.0.5 - fix sanity checks for brackets in server name
+
+From: Siddhesh Poyarekar <siddhesh.poyarekar@gmail.com>
+
+When autofs is configured as follows:
+
+* -nodev,nosuid,intr,soft,retry=10,proto=tcp &:/tmp1
+
+One could make a mount request as follows:
+
+df /autom/tmp1/som\(efile
+
+and crash automount, since automount tries to parse the brackets to
+get the weight for the server. Automount should not parse these
+brackets if they're escaped.
+
+Also throw a syntax error in case of mismatched brackets instead of
+crashing. Sample configuration for this:
+
+* -nodev,nosuid,intr,soft,retry=10,proto=tcp foo(2:/tmp1
+
+Signed-off-by: Siddhesh Poyarekar <siddhesh.poyarekar@gmail.com>
+Signed-off-by: Ian Kent <raven@themaw.net>
+---
+
+ CHANGELOG            |    1 +
+ modules/replicated.c |    8 +++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -59,6 +59,7 @@
+ - reset negative status on cache prune.
+ - fix wildcard map entry match.
+ - fix sasl bind host name selection.
++- fix sanity checks for brackets in server name.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/modules/replicated.c
++++ autofs-5.0.5/modules/replicated.c
+@@ -1225,7 +1225,7 @@ static char *seek_delim(const char *s)
+ 	char *delim;
+ 
+ 	delim = strpbrk(p, "(, \t:");
+-	if (delim && *delim != ':')
++	if (delim && *delim != ':' && (delim == s || *(delim - 1) != '\\'))
+ 		return delim;
+ 
+ 	while (*p) {
+@@ -1274,6 +1274,12 @@ int parse_location(unsigned logopt, stru
+ 					*delim = '\0';
+ 					weight = atoi(w);
+ 				}
++				else {
++					/* syntax error - Mismatched brackets */
++					free_host_list(hosts);
++					free(str);
++					return 0;
++				}
+ 				delim++;
+ 			}
+ 

@@ -1,0 +1,136 @@
+Index: autofs-5.0.5/modules/lookup_file.c
+===================================================================
+--- autofs-5.0.5.orig/modules/lookup_file.c
++++ autofs-5.0.5/modules/lookup_file.c
+@@ -49,6 +49,95 @@
+ 
+ int lookup_version = AUTOFS_LOOKUP_VERSION;	/* Required by protocol */
+ 
++struct dyn_file_context {
++    const char* path;
++    int pread;
++    int pwrite;
++};
++
++static void* run_dyn_file(void *arg) {
++    pid_t pid;
++    int pipefd[2];
++    const char* path = NULL;
++    struct dyn_file_context* ctx = (struct dyn_file_context*) arg;
++
++    path = ctx->path;
++    pipefd[0] = ctx->pread;
++    pipefd[1] = ctx->pwrite;
++    free(ctx);
++
++    pid = fork();
++    if (pid < 0) {
++        logerr(MODPREFIX "fork error");
++        // pipefd[0] will be closed by fclose
++        close(pipefd[1]);
++        return;
++    }
++
++    if (pid == 0) { // execute the file
++        close(pipefd[0]);
++        dup2(pipefd[1], STDOUT_FILENO);
++        close(pipefd[1]);
++        execl(path, path, NULL);
++        logerr(MODPREFIX "fail to execute %s", path);
++        exit(255);	/* execl() failed */
++    }
++
++    // close the write end
++    close(pipefd[1]);
++    // wait for the forked child
++    pid = waitpid(pid, NULL, 0);
++    if (pid == -1)
++        logerr("waitpid error: %s", strerror(errno));
++}
++
++static FILE *open_fopen_r_dyn(const char *path)
++{
++    FILE  *f;
++    pid_t pid;
++    int   pipefd[2];
++    pthread_t thread;
++    struct dyn_file_context* context = NULL;
++
++    if (!access(path, X_OK)) {
++        debug(LOGOPT_NONE, "%s is executable, load it as dynamic file", path);
++
++        // execute the file and pipe the stdout
++        if (pipe(pipefd)) {
++            logerr(MODPREFIX "fail to create pipe");
++            return NULL;
++        }
++
++        context = malloc(sizeof(*context));
++        context->path = path;
++        context->pread = pipefd[0];
++        context->pwrite = pipefd[1];
++
++        if (pthread_create(&thread, NULL, run_dyn_file, (void *) context)) {
++            logerr(MODPREFIX "pthread_create error: %s", strerror(errno));
++            close(pipefd[0]);
++            close(pipefd[1]);
++            free(context);
++            return NULL;
++        }
++        // from this point, context is managed by the run_dyn_file thread
++        pthread_detach(thread);
++        
++        f = fdopen(pipefd[0], "r");
++    }
++    else
++        f = fopen(path, "r");
++
++    if (f == NULL) {
++        logerr(MODPREFIX "open file error: %s", strerror(errno));
++        return NULL;
++    }
++#if defined(O_CLOEXEC) && defined(SOCK_CLOEXEC)
++    check_cloexec(fileno(f));
++#endif
++    return f;
++}
++
+ int lookup_init(const char *mapfmt, int argc, const char *const *argv, void **context)
+ {
+ 	struct lookup_context *ctxt;
+@@ -393,7 +482,7 @@
+ 		return NSS_STATUS_UNAVAIL;
+ 	}
+ 
+-	f = open_fopen_r(ctxt->mapname);
++	f = open_fopen_r_dyn(ctxt->mapname);
+ 	if (!f) {
+ 		error(logopt,
+ 		      MODPREFIX "could not open master map file %s",
+@@ -609,7 +698,7 @@
+ 		return NSS_STATUS_UNAVAIL;
+ 	}
+ 
+-	f = open_fopen_r(ctxt->mapname);
++	f = open_fopen_r_dyn(ctxt->mapname);
+ 	if (!f) {
+ 		error(ap->logopt,
+ 		      MODPREFIX "could not open map file %s", ctxt->mapname);
+@@ -704,7 +793,7 @@
+ 
+ 	mc = source->mc;
+ 
+-	f = open_fopen_r(ctxt->mapname);
++	f = open_fopen_r_dyn(ctxt->mapname);
+ 	if (!f) {
+ 		error(ap->logopt,
+ 		      MODPREFIX "could not open map file %s", ctxt->mapname);
+@@ -809,7 +898,7 @@
+ 
+ 	mc = source->mc;
+ 
+-	f = open_fopen_r(ctxt->mapname);
++	f = open_fopen_r_dyn(ctxt->mapname);
+ 	if (!f) {
+ 		error(ap->logopt,
+ 		      MODPREFIX "could not open map file %s", ctxt->mapname);

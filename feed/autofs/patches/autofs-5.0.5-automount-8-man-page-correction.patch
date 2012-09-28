@@ -1,0 +1,33 @@
+autofs-5.0.5 - automount(8) man page correction
+
+From: Ian Kent <raven@themaw.net>
+
+Correct reference to auto.master(8) in man page automount(8).
+---
+
+ CHANGELOG       |    1 +
+ man/automount.8 |    2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -48,6 +48,7 @@
+ - fix next task list update.
+ - fix stale map read.
+ - fix null cache clean.
++- automount(8) man page correction.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/man/automount.8
++++ autofs-5.0.5/man/automount.8
+@@ -16,7 +16,7 @@ The \fBautomount\fP program is used to m
+ autofs, the inlined Linux automounter.  \fBautomount\fP works by
+ reading the
+ .nh
+-.BR auto.master (8)
++.BR auto.master (5)
+ .hy
+ map and sets up mount points for each entry in the master map allowing
+ them to be automatically mounted when accessed. The file systems are

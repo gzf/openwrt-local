@@ -1,0 +1,11 @@
+--- a/include/rpc_subs.h	2011-06-28 15:34:35.000000000 +0800
++++ b/include/rpc_subs.h	2012-02-28 15:42:51.000000000 +0800
+@@ -18,7 +18,7 @@
+ 
+ #include <rpc/rpc.h>
+ #include <rpc/pmap_prot.h>
+-#include <nfs/nfs.h>
++#include <linux/nfs.h>
+ #include <linux/nfs2.h>
+ #include <linux/nfs3.h>
+ 

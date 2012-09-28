@@ -1,8 +1,6 @@
+feeds-conf
 fix-1041n-board-definition
 1041n-usb-modification
 mw4530r-support
 wifi-force-option
-pkg-autofs5
-pkg-incron
-pkg-ez-ipupdate-3322
 pkg-vim-small

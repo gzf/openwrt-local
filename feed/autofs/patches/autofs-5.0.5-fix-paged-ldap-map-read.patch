@@ -1,0 +1,57 @@
+autofs-5.0.5 - fix paged ldap map read
+
+From: Ian Kent <raven@themaw.net>
+
+With certain LDAP configurations autofs can loop indefinitely
+when trying to perform a paged result query to get the map.
+---
+
+ CHANGELOG             |    1 +
+ modules/lookup_ldap.c |   13 ++++---------
+ 2 files changed, 5 insertions(+), 9 deletions(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -53,6 +53,7 @@
+ - fix prune cache valid check.
+ - fix map source check in file lookup.
+ - auto adjust ldap page size.
++- fix paged ldap map read.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/modules/lookup_ldap.c
++++ autofs-5.0.5/modules/lookup_ldap.c
+@@ -2330,27 +2330,22 @@ static int read_one_map(struct autofs_po
+ 	      MODPREFIX "searching for \"%s\" under \"%s\"", sp.query, ctxt->qdn);
+ 
+ 	sp.cookie = NULL;
+-	sp.pageSize = 1000;
++	sp.pageSize = 2000;
+ 	sp.morePages = FALSE;
+ 	sp.totalCount = 0;
+ 	sp.result = NULL;
+ 
+ 	do {
+ 		rv = do_paged_query(&sp, ctxt);
+-		if (rv == LDAP_SIZELIMIT_EXCEEDED) {
+-			debug(ap->logopt, MODPREFIX "result size exceed");
+-			if (sp.result)
+-				ldap_msgfree(sp.result);
+-			continue;
+-		}
+ 
+-		if (rv == LDAP_ADMINLIMIT_EXCEEDED) {
++		if (rv == LDAP_ADMINLIMIT_EXCEEDED ||
++		    rv == LDAP_SIZELIMIT_EXCEEDED) {
+ 			if (sp.result)
+ 				ldap_msgfree(sp.result);
+ 			sp.pageSize = sp.pageSize / 2;
+ 			if (sp.pageSize < 5) {
+ 				debug(ap->logopt, MODPREFIX
+-				      "administrative result size too small");
++				      "result size too small");
+ 				unbind_ldap_connection(ap->logopt, sp.ldap, ctxt);
+ 				*result_ldap = rv;
+ 				free(sp.query);

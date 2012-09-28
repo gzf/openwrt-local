@@ -1,0 +1,118 @@
+autofs-5.0.5 - include ip address in debug logging
+
+From: Ian Kent <raven@themaw.net>
+
+When probing availability of a host also log the network address along
+with the host name.
+---
+
+ CHANGELOG            |    1 +
+ include/rpc_subs.h   |    1 +
+ lib/rpc_subs.c       |   20 ++++++++++++++++++++
+ modules/replicated.c |   24 +++++++++++++++++++-----
+ 4 files changed, 41 insertions(+), 5 deletions(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -41,6 +41,7 @@
+ - add simple bind authentication.
+ - use weight only for server selection.
+ - fix isspace() wild card substition.
++- include ip address in debug logging.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/include/rpc_subs.h
++++ autofs-5.0.5/include/rpc_subs.h
+@@ -69,6 +69,7 @@ int rpc_ping_proto(struct conn_info *);
+ int rpc_ping(const char *, long, long, unsigned int);
+ double elapsed(struct timeval, struct timeval);
+ int rpc_time(const char *, unsigned int, unsigned int, long, long, unsigned int, double *);
++const char *get_addr_string(struct sockaddr *, char *, socklen_t);
+ 
+ #endif
+ 
+--- autofs-5.0.5.orig/lib/rpc_subs.c
++++ autofs-5.0.5/lib/rpc_subs.c
+@@ -983,6 +983,26 @@ try_tcp:
+ 	return exportlist;
+ }
+ 
++const char *get_addr_string(struct sockaddr *sa, char *name, socklen_t len)
++{
++	void *addr;
++
++	if (len < INET6_ADDRSTRLEN)
++		return NULL;
++
++	if (sa->sa_family == AF_INET) {
++		struct sockaddr_in *ipv4 = (struct sockaddr_in *) sa;
++		addr = &(ipv4->sin_addr);
++	} else if (sa->sa_family == AF_INET6) {
++		struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *) sa;
++		addr = &(ipv6->sin6_addr);
++	} else {
++		return NULL;
++	}
++
++	return inet_ntop(sa->sa_family, addr, name, len);
++}
++
+ #if 0
+ #include <stdio.h>
+ 
+--- autofs-5.0.5.orig/modules/replicated.c
++++ autofs-5.0.5/modules/replicated.c
+@@ -526,6 +526,8 @@ static unsigned int get_nfs_info(unsigne
+ 	char *have_port_opt = options ? strstr(options, "port=") : NULL;
+ 	unsigned int random_selection = host->options & MOUNT_FLAG_RANDOM_SELECT;
+ 	unsigned int use_weight_only = host->options & MOUNT_FLAG_USE_WEIGHT_ONLY;
++	socklen_t len = INET6_ADDRSTRLEN;
++	char buf[len + 1];
+ 	struct pmap parms;
+ 	struct timeval start, end;
+ 	struct timezone tz;
+@@ -533,9 +535,14 @@ static unsigned int get_nfs_info(unsigne
+ 	double taken = 0;
+ 	int status, count = 0;
+ 
+-	debug(logopt,
+-	      "called for host %s proto %s version 0x%x",
+-	      host->name, proto, version);
++	if (host->addr)
++		debug(logopt, "called with host %s(%s) proto %s version 0x%x",
++		      host->name, get_addr_string(host->addr, buf, len),
++		      proto, version);
++	else
++		debug(logopt,
++		      "called for host %s proto %s version 0x%x",
++		      host->name, proto, version);
+ 
+ 	memset(&parms, 0, sizeof(struct pmap));
+ 
+@@ -748,6 +755,8 @@ static int get_supported_ver_and_cost(un
+ 	char *have_port_opt = options ? strstr(options, "port=") : NULL;
+ 	unsigned int random_selection = host->options & MOUNT_FLAG_RANDOM_SELECT;
+ 	unsigned int use_weight_only = host->options & MOUNT_FLAG_USE_WEIGHT_ONLY;
++	socklen_t len = INET6_ADDRSTRLEN;
++	char buf[len + 1];
+ 	struct conn_info pm_info, rpc_info;
+ 	struct pmap parms;
+ 	const char *proto;
+@@ -758,8 +767,13 @@ static int get_supported_ver_and_cost(un
+ 	time_t timeout = RPC_TIMEOUT;
+ 	int status;
+ 
+-	debug(logopt,
+-	      "called with host %s version 0x%x", host->name, version);
++	if (host->addr)
++		debug(logopt, "called with host %s(%s) version 0x%x",
++			host->name, get_addr_string(host->addr, buf, len),
++			version);
++	else
++		debug(logopt, "called with host %s version 0x%x",
++			host->name, version);
+ 
+ 	memset(&pm_info, 0, sizeof(struct conn_info));
+ 	memset(&rpc_info, 0, sizeof(struct conn_info));

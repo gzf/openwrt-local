@@ -1,0 +1,43 @@
+autofs-5.0.5 - wait for master source mutex
+
+From: Ian Kent <raven@themaw.net>
+
+Occasionally we might not be able to get the master source write
+lock when a read lock is held. We can wait a little while to see
+if it gets released without causing a problem.
+---
+
+ lib/master.c |   15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+
+--- autofs-5.0.5.orig/lib/master.c
++++ autofs-5.0.5/lib/master.c
+@@ -535,13 +535,26 @@ void send_map_update_request(struct auto
+ 
+ void master_source_writelock(struct master_mapent *entry)
+ {
++	int retries = 5; /* 1 second maximum */
+ 	int status;
+ 
+-	status = pthread_rwlock_wrlock(&entry->source_lock);
++	while (retries--) {
++		status = pthread_rwlock_wrlock(&entry->source_lock);
++		if (status != EAGAIN)
++			break;
++		else {
++                	struct timespec t = { 0, 200000000 };
++	                struct timespec r;
++                	while (nanosleep(&t, &r) == -1 && errno == EINTR)
++                        	memcpy(&t, &r, sizeof(struct timespec));
++		}
++	}
++
+ 	if (status) {
+ 		logmsg("master_mapent source write lock failed");
+ 		fatal(status);
+ 	}
++
+ 	return;
+ }
+ 

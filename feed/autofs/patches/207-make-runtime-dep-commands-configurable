@@ -1,0 +1,59 @@
+Index: autofs-5.0.5/aclocal.m4
+===================================================================
+--- autofs-5.0.5.orig/aclocal.m4
++++ autofs-5.0.5/aclocal.m4
+@@ -5,15 +5,22 @@
+ dnl Like AC_PATH_PROGS, but add to the .h file as well
+ dnl --------------------------------------------------------------------------
+ AC_DEFUN(AF_PATH_INCLUDE,
+-[AC_PATH_PROGS($1,$2,$3,$4)
+-if test -n "$$1"; then
+-  AC_DEFINE(HAVE_$1,1,[define if you have $1])
+-  AC_DEFINE_UNQUOTED(PATH_$1, "$$1", [define if you have $1])
++[ 
++  $1="$2"
++  AC_ARG_WITH($1,
++  [  --with-$1=PATH	  override the default value with PATH ],
++	 if test -n "$withval"
++     then
++       $1="${withval}"
++     fi
++  )
++  AC_MSG_CHECKING([for $1 executable])
++  AC_MSG_RESULT([$$1])
++
++  AC_DEFINE(HAVE_$1,1,[define $1])
++  AC_DEFINE_UNQUOTED(PATH_$1, "$$1", [define $1])
+   HAVE_$1=1
+-else
+-  HAVE_$1=0
+-fi
+-AC_SUBST(HAVE_$1)])
++  AC_SUBST(HAVE_$1)])
+ 
+ dnl --------------------------------------------------------------------------
+ dnl AF_CHECK_PROG:
+Index: autofs-5.0.5/configure.in
+===================================================================
+--- autofs-5.0.5.orig/configure.in
++++ autofs-5.0.5/configure.in
+@@ -127,12 +127,13 @@
+ #
+ # Programs needed for various system functions or modules
+ #
+-AF_PATH_INCLUDE(MOUNT, mount, /bin/mount, $searchpath)
+-AF_PATH_INCLUDE(UMOUNT, umount, /bin/umount, $searchpath)
+-AF_PATH_INCLUDE(E2FSCK, fsck.ext2 e2fsck, , $searchpath)
+-AF_PATH_INCLUDE(E3FSCK, fsck.ext3 e3fsck, , $searchpath)
+-AF_PATH_INCLUDE(E4FSCK, fsck.ext4 e4fsck, , $searchpath)
+-AF_PATH_INCLUDE(MODPROBE, modprobe, , $searchpath)
++AF_PATH_INCLUDE(MOUNT, /bin/mount)
++AF_PATH_INCLUDE(MOUNT_NFS, /sbin/mount.nfs)
++AF_PATH_INCLUDE(UMOUNT, /bin/umount)
++AF_PATH_INCLUDE(E2FSCK, /sbin/fsck.ext2)
++AF_PATH_INCLUDE(E3FSCK, /sbin/fsck.ext3)
++AF_PATH_INCLUDE(E4FSCK, /sbin/fsck.ext4)
++AF_PATH_INCLUDE(MODPROBE, /sbin/modprobe)
+ 
+ AF_CHECK_PROG(LEX, flex lex, , $searchpath)
+ AF_CHECK_PROG(YACC, bison, , $searchpath)

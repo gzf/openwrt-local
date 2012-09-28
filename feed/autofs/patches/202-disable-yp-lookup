@@ -1,0 +1,40 @@
+Index: autofs-5.0.5/modules/Makefile
+===================================================================
+--- autofs-5.0.5.orig/modules/Makefile
++++ autofs-5.0.5/modules/Makefile
+@@ -11,7 +11,7 @@
+ 	mount_generic.c  mount_nfs.c  mount_afs.c  mount_autofs.c \
+ 	mount_changer.c  mount_bind.c
+ 
+-MODS :=	lookup_yp.so lookup_file.so lookup_program.so lookup_userhome.so \
++MODS :=	lookup_file.so lookup_program.so lookup_userhome.so \
+ 	lookup_multi.so lookup_hosts.so \
+ 	parse_sun.so \
+ 	mount_generic.so mount_nfs.so mount_afs.so mount_autofs.so \
+Index: autofs-5.0.5/daemon/lookup.c
+===================================================================
+--- autofs-5.0.5.orig/daemon/lookup.c
++++ autofs-5.0.5/daemon/lookup.c
+@@ -169,9 +169,6 @@
+ 
+ 			memset(source, 0, 10);
+ 			if (!strncmp(name, "file:", 5) ||
+-			    !strncmp(name, "yp:", 3) ||
+-			    !strncmp(name, "nis:", 4) ||
+-			    !strncmp(name, "nisplus:", 8) ||
+ 			    !strncmp(name, "ldap:", 5) ||
+ 			    !strncmp(name, "ldaps:", 6)) {
+ 				strncpy(source, name, tmp - name);
+Index: autofs-5.0.5/lib/rpc_subs.c
+===================================================================
+--- autofs-5.0.5.orig/lib/rpc_subs.c
++++ autofs-5.0.5/lib/rpc_subs.c
+@@ -27,7 +27,7 @@
+ #include <net/if.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+-#include <rpcsvc/ypclnt.h>
++//#include <rpcsvc/ypclnt.h>
+ #include <errno.h>
+ #include <sys/ioctl.h>
+ #include <ctype.h>

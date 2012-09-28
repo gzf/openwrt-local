@@ -1,0 +1,791 @@
+autofs-5.0.5 - replace GPLv3 code
+
+From: Ian Kent <raven@themaw.net>
+
+The code to get SRV records from DNS was taken from Samba.
+Samba is a GPLv3 licensed work which forces autofs to GPLv3.
+
+I don't know enough about GPLv3 to know if that is a good thing
+but I also don't like autofs being forced to GPLv3 because one
+of the copyright holders won't grant permission to use the code
+under a GPLv2 license.
+---
+
+ CHANGELOG        |    1 
+ modules/dclist.c |  592 +++++++++++++++++--------------------------------------
+ 2 files changed, 193 insertions(+), 400 deletions(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -62,6 +62,7 @@
+ - fix sanity checks for brackets in server name.
+ - fix mapent becomes negative during lookup.
+ - check each dc server individually.
++- replace GPLv3 with GPLv2 code for SRV record handling.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/modules/dclist.c
++++ autofs-5.0.5/modules/dclist.c
+@@ -1,19 +1,10 @@
+ /*
+- * Copyright 2009 Ian Kent <raven@themaw.net>
+- * Copyright 2009 Red Hat, Inc.
+- *
+- * This module was apapted from code contained in the Samba distribution
+- * file source/libads/dns.c which contained the following copyright
+- * information:
+- *
+- * Unix SMB/CIFS implementation.
+- * DNS utility library
+- * Copyright (C) Gerald (Jerry) Carter           2006.
+- * Copyright (C) Jeremy Allison                  2007.
++ * Copyright 2011 Ian Kent <raven@themaw.net>
++ * Copyright 2011 Red Hat, Inc.
+  *
+  * This program is free software; you can redistribute it and/or modify
+  * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 3 of the License, or
++ * the Free Software Foundation, either version 2 of the License, or
+  * (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful,
+@@ -25,7 +16,9 @@
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
++#include <sys/types.h>
+ #include <netinet/in.h>
++#include <arpa/inet.h>
+ #include <arpa/nameser.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -39,80 +32,21 @@
+ #include "automount.h"
+ #include "dclist.h"
+ 
+-#define	MAX_DNS_PACKET_SIZE	0xffff
+-#define	MAX_DNS_NAME_LENGTH	MAXHOSTNAMELEN
+-/* The longest time we will cache dns srv records */
+-#define MAX_TTL			(60*60*1) /* 1 hours */
+-
+-#ifdef NS_HFIXEDSZ	/* Bind 8/9 interface */
+-#if !defined(C_IN)	/* AIX 5.3 already defines C_IN */
+-#  define C_IN		ns_c_in
+-#endif
+-#if !defined(T_A)	/* AIX 5.3 already defines T_A */
+-#  define T_A   	ns_t_a
+-#endif
+-
+-#  define T_SRV 	ns_t_srv
+-#if !defined(T_NS)	/* AIX 5.3 already defines T_NS */
+-#  define T_NS 		ns_t_ns
+-#endif
+-#else
+-#  ifdef HFIXEDSZ
+-#    define NS_HFIXEDSZ HFIXEDSZ
+-#  else
+-#    define NS_HFIXEDSZ sizeof(HEADER)
+-#  endif	/* HFIXEDSZ */
+-#  ifdef PACKETSZ
+-#    define NS_PACKETSZ	PACKETSZ
+-#  else	/* 512 is usually the default */
+-#    define NS_PACKETSZ	512
+-#  endif	/* PACKETSZ */
+-#  define T_SRV 	33
+-#endif
+-
+-#define SVAL(buf, pos) (*(const uint16_t *)((const char *)(buf) + (pos)))
+-#define IVAL(buf, pos) (*(const uint32_t *)((const char *)(buf) + (pos)))
+-
+-#if __BYTE_ORDER == __LITTLE_ENDIAN
+-#define SREV(x) ((((x)&0xFF)<<8) | (((x)>>8)&0xFF))
+-#define IREV(x) ((SREV(x)<<16) | (SREV((x)>>16)))
+-#else
+-#define SREV(x) (x)
+-#define IREV(x) (x)
+-#endif
+-
+-#define RSVAL(buf, pos) SREV(SVAL(buf, pos))
+-#define RIVAL(buf, pos) IREV(IVAL(buf, pos))
+-
+-#define QSORT_CAST	(int (*)(const void *, const void *))
+-
+-/* DNS query section in replies */
+-
+-struct dns_query {
+-	const char *hostname;
+-	uint16_t type;
+-	uint16_t in_class;
+-};
+-
+-/* DNS RR record in reply */
++#define MAX_TTL		(60*60) /* 1 hour */
+ 
+-struct dns_rr {
+-	const char *hostname;
+-	uint16_t type;
+-	uint16_t in_class;
+-	uint32_t ttl;
+-	uint16_t rdatalen;
+-	uint8_t *rdata;
++struct rr {
++	unsigned int type;
++	unsigned int class;
++	unsigned long ttl;
++	unsigned int len;
+ };
+ 
+-/* SRV records */
+-
+-struct dns_rr_srv {
+-	const char *hostname;
+-	uint16_t priority;
+-	uint16_t weight;
+-	uint16_t port;
+-	uint32_t ttl;
++struct srv_rr {
++	const char *name;
++	unsigned int priority;
++	unsigned int weight;
++	unsigned int port;
++	unsigned long ttl;
+ };
+ 
+ static pthread_mutex_t dclist_mutex = PTHREAD_MUTEX_INITIALIZER;
+@@ -133,374 +67,224 @@ static void dclist_mutex_unlock(void)
+ 	return;
+ }
+ 
+-static int dns_parse_query(unsigned int logopt,
+-			   uint8_t *start, uint8_t *end,
+-			   uint8_t **ptr, struct dns_query *q)
++static int do_srv_query(unsigned int logopt, char *name, u_char **packet)
+ {
+-	uint8_t *p = *ptr;
+-	char hostname[MAX_DNS_NAME_LENGTH];
+-	char buf[MAX_ERR_BUF];
+-	int namelen;
+-
+-	if (!start || !end || !q || !*ptr)
+-		return 0;
++	unsigned int len = PACKETSZ;
++	unsigned int last_len = len;
++	char ebuf[MAX_ERR_BUF];
++	u_char *buf;
++
++	while (1) {
++		buf = malloc(last_len);
++		if (!buf) {
++			char *estr = strerror_r(errno, ebuf, MAX_ERR_BUF);
++			error(logopt, "malloc: %s", estr);
++			return -1;
++		}
+ 
+-	memset(q, 0, sizeof(*q));
++		len = res_query(name, C_IN, T_SRV, buf, last_len);
++		if (len < 0) {
++			char *estr = strerror_r(errno, ebuf, MAX_ERR_BUF);
++			error(logopt, "Failed to resolve %s (%s)", name, estr);
++			free(buf);
++			return -1;
++		}
+ 
+-	/* See RFC 1035 for details. If this fails, then return. */
++		if (len == last_len) {
++			/* These shouldn't too large, bump by PACKETSZ only */
++			last_len += PACKETSZ;
++			free(buf);
++			continue;
++		}
+ 
+-	namelen = dn_expand(start, end, p, hostname, sizeof(hostname));
+-	if (namelen < 0) {
+-		error(logopt, "failed to expand query hostname");
+-		return 0;
++		break;
+ 	}
+ 
+-	p += namelen;
+-	q->hostname = strdup(hostname);
+-	if (!q) {
+-		char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+-		error(logopt, "strdup: %s", estr);
+-		return 0;
+-	}
++	*packet = buf;
+ 
+-	/* check that we have space remaining */
++	return len;
++}
+ 
+-	if (p + 4 > end) {
+-		error(logopt, "insufficient buffer space for result");
+-		free((void *) q->hostname);
+-		return 0;
+-	}
++static int get_name_len(u_char *buffer, u_char *start, u_char *end)
++{
++	char tmp[MAXDNAME];
++	return dn_expand(buffer, end, start, tmp, MAXDNAME);
++}
+ 
+-	q->type     = RSVAL(p, 0);
+-	q->in_class = RSVAL(p, 2);
+-	p += 4;
++static int get_data_offset(u_char *buffer,
++			   u_char *start, u_char *end,
++			   struct rr *rr)
++{
++	u_char *cp = start;
++	int name_len;
+ 
+-	*ptr = p;
++	name_len = get_name_len(buffer, start, end);
++	if (name_len < 0)
++		return -1;
++	cp += name_len;
+ 
+-	return 1;
++	GETSHORT(rr->type, cp);
++	GETSHORT(rr->class, cp);
++	GETLONG(rr->ttl, cp);
++	GETSHORT(rr->len, cp);
++
++	return (cp - start);
+ }
+ 
+-static int dns_parse_rr(unsigned int logopt,
+-			uint8_t *start, uint8_t *end,
+-			uint8_t **ptr, struct dns_rr *rr)
++static struct srv_rr *parse_srv_rr(unsigned int logopt,
++				   u_char *buffer, u_char *start, u_char *end,
++				   struct rr *rr, struct srv_rr *srv)
+ {
+-	uint8_t *p = *ptr;
+-	char hostname[MAX_DNS_NAME_LENGTH];
+-	char buf[MAX_ERR_BUF];
+-	int namelen;
+-
+-	if (!start || !end || !rr || !*ptr)
+-		return 0;
+-
+-	memset(rr, 0, sizeof(*rr));
++	u_char *cp = start;
++	char ebuf[MAX_ERR_BUF];
++	char tmp[MAXDNAME];
++	int len;
+ 
+-	/* pull the name from the answer */
++	GETSHORT(srv->priority, cp);
++	GETSHORT(srv->weight, cp);
++	GETSHORT(srv->port, cp);
++	srv->ttl = rr->ttl;
+ 
+-	namelen = dn_expand(start, end, p, hostname, sizeof(hostname));
+-	if (namelen < 0) {
+-		error(logopt, "failed to expand query hostname");
+-		return 0;
++	len = dn_expand(buffer, end, cp, tmp, MAXDNAME);
++	if (len < 0) {
++		error(logopt, "failed to expand name");
++		return NULL;
+ 	}
+-	p += namelen;
+-	rr->hostname = strdup(hostname);
+-	if (!rr->hostname) {
+-		char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
++	srv->name = strdup(tmp);
++	if (!srv->name) {
++		char *estr = strerror_r(errno, ebuf, MAX_ERR_BUF);
+ 		error(logopt, "strdup: %s", estr);
+-		return 0;
+-	}
+-
+-	/* check that we have space remaining */
+-
+-	if (p + 10 > end) {
+-		error(logopt, "insufficient buffer space for result");
+-		free((void *) rr->hostname);
+-		return 0;
++		return NULL;
+ 	}
+ 
+-	/* pull some values and then skip onto the string */
+-
+-	rr->type     = RSVAL(p, 0);
+-	rr->in_class = RSVAL(p, 2);
+-	rr->ttl      = RIVAL(p, 4);
+-	rr->rdatalen = RSVAL(p, 8);
++	return srv;
++}
+ 
+-	p += 10;
++static int cmp(struct srv_rr *a, struct srv_rr *b)
++{
++	if (a->priority < b->priority)
++		return -1;
+ 
+-	/* sanity check the available space */
++	if (a->priority > b->priority)
++		return 1;
+ 
+-	if (p + rr->rdatalen > end) {
+-		error(logopt, "insufficient buffer space for data");
+-		free((void *) rr->hostname);
++	if (!a->weight || a->weight == b->weight)
+ 		return 0;
+-	}
+ 
+-	/* save a point to the rdata for this section */
+-
+-	rr->rdata = p;
+-	p += rr->rdatalen;
+-
+-	*ptr = p;
++	if (a->weight > b->weight)
++		return -1;
+ 
+ 	return 1;
+ }
+ 
+-static int dns_parse_rr_srv(unsigned int logopt,
+-			    uint8_t *start, uint8_t *end,
+-			    uint8_t **ptr, struct dns_rr_srv *srv)
+-{
+-	struct dns_rr rr;
+-	uint8_t *p;
+-	char dcname[MAX_DNS_NAME_LENGTH];
+-	char buf[MAX_ERR_BUF];
+-	int namelen;
+-
+-	if (!start || !end || !srv || !*ptr)
+-		return 0;
+-
+-	/* Parse the RR entry.  Coming out of the this, ptr is at the beginning
+-	   of the next record */
+-
+-	if (!dns_parse_rr(logopt, start, end, ptr, &rr)) {
+-		error(logopt, "Failed to parse RR record");
+-		return 0;
+-	}
++static void free_srv_rrs(struct srv_rr *dcs, unsigned int count)
++{
++	int i;
+ 
+-	if (rr.type != T_SRV) {
+-		error(logopt, "Bad answer type (%d)", rr.type);
+-		return 0;
++	for (i = 0; i < count; i++) {
++		if (dcs[i].name)
++			free((void *) dcs[i].name);
+ 	}
++	free(dcs);
++}
+ 
+-	p = rr.rdata;
++int get_srv_rrs(unsigned int logopt,
++		char *name, struct srv_rr **dcs, unsigned int *dcs_count)
++{
++	struct srv_rr *srvs;
++	unsigned int srv_num;
++	HEADER *header;
++	u_char *packet;
++	u_char *start;
++	u_char *end;
++	unsigned int count;
++	int i, len;
++	char ebuf[MAX_ERR_BUF];
+ 
+-	srv->priority = RSVAL(p, 0);
+-	srv->weight   = RSVAL(p, 2);
+-	srv->port     = RSVAL(p, 4);
+-	srv->ttl      = rr.ttl;
+-
+-	p += 6;
+-
+-	namelen = dn_expand(start, end, p, dcname, sizeof(dcname));
+-	if (namelen < 0) {
+-		error(logopt, "Failed to expand dcname");
++	len = do_srv_query(logopt, name, &packet);
++	if (len < 0)
+ 		return 0;
+-	}
+ 
+-	srv->hostname = strdup(dcname);
+-	if (!srv->hostname) {
+-		char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+-		error(logopt, "strdup: %s", estr);
+-		return 0;
+-	}
++	header = (HEADER *) packet;
++	start = packet + sizeof(HEADER);
++	end = packet + len;
+ 
+-	debug(logopt, "Parsed %s [%u, %u, %u]",
+-	      srv->hostname, srv->priority, srv->weight, srv->port);
++	srvs = NULL;
++	srv_num = 0;
+ 
+-	return 1;
+-}
+-
+-/*********************************************************************
+- Sort SRV record list based on weight and priority.  See RFC 2782.
+-*********************************************************************/
+-
+-static int dnssrvcmp(struct dns_rr_srv *a, struct dns_rr_srv *b)
+-{
+-	if (a->priority == b->priority) {
+-		/* randomize entries with an equal weight and priority */
+-		if (a->weight == b->weight)
+-			return 0;
+-
+-		/* higher weights should be sorted lower */
+-		if (a->weight > b->weight)
+-			return -1;
+-		else
+-			return 1;
++	/* Skip over question */
++	len = get_name_len(packet, start, end);
++	if (len < 0) {
++		error(logopt, "failed to get name length");
++		goto error_out;
+ 	}
+ 
+-	if (a->priority < b->priority)
+-		return -1;
++	start += len + QFIXEDSZ;
+ 
+-	return 1;
+-}
++	count = ntohs(header->ancount);
+ 
+-#define DNS_FAILED_WAITTIME          30
++	debug(logopt, "%d records returned in the answer section", count);
+ 
+-static int dns_send_req(unsigned int logopt,
+-			const char *name, int q_type, uint8_t **rbuf,
+-			int *resp_length)
+-{
+-	uint8_t *buffer = NULL;
+-	size_t buf_len = 0;
+-	int resp_len = NS_PACKETSZ;
+-	static time_t last_dns_check = 0;
+-	static unsigned int last_dns_status = 0;
+-	time_t now = time(NULL);
+-	char buf[MAX_ERR_BUF];
++	if (count <= 0) {
++		error(logopt, "no records found in answers section");
++		goto error_out;
++	}
+ 
+-	/* Try to prevent bursts of DNS lookups if the server is down */
++	srvs = malloc(sizeof(struct srv_rr) * count);
++	if (!srvs) {
++		char *estr = strerror_r(errno, ebuf, MAX_ERR_BUF);
++		error(logopt, "malloc: %s", estr);
++		goto error_out;
++	}
++	memset(srvs, 0, sizeof(struct srv_rr) * count);
+ 
+-	/* Protect against large clock changes */
++	srv_num = 0;
++	for (i = 0; i < count && (start < end); i++) {
++		unsigned int data_offset;
++		struct srv_rr srv;
++		struct srv_rr *psrv;
++		struct rr rr;
+ 
+-	if (last_dns_check > now)
+-		last_dns_check = 0;
++		memset(&rr, 0, sizeof(struct rr));
+ 
+-	/* IF we had a DNS timeout or a bad server and we are still
+-	   in the 30 second cache window, just return the previous
+-	   status and save the network timeout. */
+-
+-	if ((last_dns_status == ETIMEDOUT ||
+-	     last_dns_status == ECONNREFUSED) &&
+-	     ((last_dns_check + DNS_FAILED_WAITTIME) > now)) {
+-		char *estr = strerror_r(last_dns_status, buf, MAX_ERR_BUF);
+-		debug(logopt, "Returning cached status (%s)", estr);
+-		return last_dns_status;
+-	}
+-
+-	/* Send the Query */
+-	do {
+-		if (buffer)
+-			free(buffer);
+-
+-		buf_len = resp_len * sizeof(uint8_t);
+-
+-		if (buf_len) {
+-			buffer = malloc(buf_len);
+-			if (!buffer) {
+-				char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+-				error(logopt, "malloc: %s", estr);
+-				last_dns_status = ENOMEM;
+-				last_dns_check = time(NULL);
+-				return last_dns_status;
+-			}
++		data_offset = get_data_offset(packet, start, end, &rr);
++		if (data_offset <= 0) {
++			error(logopt, "failed to get start of data");
++			goto error_out;
+ 		}
++		start += data_offset;
+ 
+-		resp_len = res_query(name, C_IN, q_type, buffer, buf_len);
+-		if (resp_len < 0) {
+-			char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+-			error(logopt, "Failed to resolve %s (%s)", name, estr);
+-			free(buffer);
+-			last_dns_status = ENOENT;
+-			last_dns_check = time(NULL);
+-			return last_dns_status;
+-		}
+-
+-		/* On AIX, Solaris, and possibly some older glibc systems (e.g. SLES8)
+-		   truncated replies never give back a resp_len > buflen
+-		   which ends up causing DNS resolve failures on large tcp DNS replies */
+-
+-		if (buf_len == resp_len) {
+-			if (resp_len == MAX_DNS_PACKET_SIZE) {
+-				error(logopt,
+-				      "DNS reply too large when resolving %s",
+-				      name);
+-				free(buffer);
+-				last_dns_status = EMSGSIZE;
+-				last_dns_check = time(NULL);
+-				return last_dns_status;
+-			}
++		if (rr.type != T_SRV)
++			continue;
+ 
+-			resp_len = MIN(resp_len * 2, MAX_DNS_PACKET_SIZE);
++		psrv = parse_srv_rr(logopt, packet, start, end, &rr, &srv);
++		if (psrv) {
++			memcpy(&srvs[srv_num], psrv, sizeof(struct srv_rr));
++			srv_num++;
+ 		}
+-	} while (buf_len < resp_len && resp_len <= MAX_DNS_PACKET_SIZE);
+-
+-	*rbuf = buffer;
+-	*resp_length = resp_len;
+-
+-	last_dns_check = time(NULL);
+-	last_dns_status = 0;
+-
+-	return 0;
+-}
+-
+-static int dns_lookup_srv(unsigned int logopt, const char *name,
+-			  struct dns_rr_srv **dclist, int *numdcs)
+-{
+-	uint8_t *buffer = NULL;
+-	int resp_len = 0;
+-	struct dns_rr_srv *dcs = NULL;
+-	int query_count, answer_count;
+-	uint8_t *p = buffer;
+-	int rrnum;
+-	int idx = 0;
+-	char buf[MAX_ERR_BUF];
+-	int ret;
+-
+-	if (!name || !dclist)
+-		return -EINVAL;
+-
+-	/* Send the request.  May have to loop several times in case
+-	   of large replies */
+-
+-	ret = dns_send_req(logopt, name, T_SRV, &buffer, &resp_len);
+-	if (ret) {
+-		error(logopt, "Failed to send DNS query");
+-		return ret;
+-	}
+-	p = buffer;
+-
+-	/* For some insane reason, the ns_initparse() et. al. routines are only
+-	   available in libresolv.a, and not the shared lib.  Who knows why....
+-	   So we have to parse the DNS reply ourselves */
+-
+-	/* Pull the answer RR's count from the header.
+-	 * Use the NMB ordering macros */
+-
+-	query_count      = RSVAL(p, 4);
+-	answer_count     = RSVAL(p, 6);
+-
+-	debug(logopt,
+-	      "%d records returned in the answer section.",
+-	       answer_count);
+ 
+-	if (answer_count) {
+-		dcs = malloc(sizeof(struct dns_rr_srv) * answer_count);
+-		if (!dcs) {
+-			char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+-			error(logopt, "malloc: %s", estr);
+-			free(buffer);
+-			return ENOMEM;
+-		}
++		start += rr.len;
+ 	}
++	free(packet);
+ 
+-	/* now skip the header */
+-
+-	p += NS_HFIXEDSZ;
+-
+-	/* parse the query section */
+-
+-	for (rrnum = 0; rrnum < query_count; rrnum++) {
+-		struct dns_query q;
+-
+-		ret = dns_parse_query(logopt, buffer, buffer+resp_len, &p, &q);
+-		if (!ret) {
+-			error(logopt,
+-			      "Failed to parse query record [%d]", rrnum);
+-			free(buffer);
+-			free(dcs);
+-			return EBADMSG;
+-		}
++	if (!srv_num) {
++		error(logopt, "no srv resource records found");
++		goto error_srvs;
+ 	}
+ 
+-	/* now we are at the answer section */
++	qsort(srvs, srv_num, sizeof(struct srv_rr),
++		(int (*)(const void *, const void *)) cmp);
+ 
+-	for (rrnum = 0; rrnum < answer_count; rrnum++) {
+-		ret = dns_parse_rr_srv(logopt,
+-				       buffer, buffer+resp_len,
+-				       &p, &dcs[rrnum]);
+-		if (!ret) {
+-			error(logopt,
+-			      "Failed to parse answer record [%d]", rrnum);
+-			free(buffer);
+-			free(dcs);
+-			return EBADMSG;
+-		}
+-	}
+-	idx = rrnum;
++	*dcs = srvs;
++	*dcs_count = srv_num;
+ 
+-	qsort(dcs, idx, sizeof(struct dns_rr_srv), QSORT_CAST dnssrvcmp);
+-
+-	*dclist = dcs;
+-	*numdcs = idx;
++	return 1;
+ 
++error_out:
++	free(packet);
++error_srvs:
++	if (srvs)
++		free_srv_rrs(srvs, srv_num);
+ 	return 0;
+ }
+ 
+@@ -553,14 +337,14 @@ void free_dclist(struct dclist *dclist)
+ static char *getdnsdomainname(unsigned int logopt)
+ {
+ 	struct addrinfo hints, *ni;
+-	char name[MAX_DNS_NAME_LENGTH + 1];
++	char name[MAXDNAME + 1];
+ 	char buf[MAX_ERR_BUF];
+ 	char *dnsdomain = NULL;
+ 	char *ptr;
+ 	int ret;
+ 
+ 	memset(name, 0, sizeof(name));
+-	if (gethostname(name, MAX_DNS_NAME_LENGTH) == -1) {
++	if (gethostname(name, MAXDNAME) == -1) {
+ 		char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+ 		error(logopt, "gethostname: %s", estr);
+ 		return NULL;
+@@ -593,14 +377,12 @@ struct dclist *get_dc_list(unsigned int 
+ {
+ 	LDAPURLDesc *ludlist = NULL;
+ 	LDAPURLDesc **ludp;
+-	struct dns_rr_srv *dcs;
+ 	unsigned int min_ttl = MAX_TTL;
+ 	struct dclist *dclist = NULL;;
+ 	char buf[MAX_ERR_BUF];
+ 	char *dn_uri, *esc_uri;
+ 	char *domain;
+ 	char *list;
+-	int numdcs;
+ 	int ret;
+ 
+ 	if (strcmp(uri, "ldap:///") && strcmp(uri, "ldaps:///")) {
+@@ -679,6 +461,8 @@ struct dclist *get_dc_list(unsigned int 
+ 	list = NULL;
+ 	for (ludp = &ludlist; *ludp != NULL;) {
+ 		LDAPURLDesc *lud = *ludp;
++		struct srv_rr *dcs = NULL;
++		unsigned int numdcs = 0;
+ 		size_t req_len, len;
+ 		char *request = NULL;
+ 		char *tmp;
+@@ -716,7 +500,7 @@ struct dclist *get_dc_list(unsigned int 
+ 		}
+ 
+ 		dclist_mutex_lock();
+-		if (dns_lookup_srv(logopt, request, &dcs, &numdcs)) {
++		if (!get_srv_rrs(logopt, request, &dcs, &numdcs)) {
+ 			error(logopt,
+ 			      "DNS SRV query failed for domain %s", domain);
+ 			dclist_mutex_unlock();
+@@ -733,7 +517,7 @@ struct dclist *get_dc_list(unsigned int 
+ 		for (i = 0; i < numdcs; i++) {
+ 			if (dcs[i].ttl > 0 && dcs[i].ttl < min_ttl)
+ 				min_ttl = dcs[i].ttl;
+-			len += strlen(dcs[i].hostname);
++			len += strlen(dcs[i].name);
+ 			if (dcs[i].port > 0)
+ 				len += sizeof(":65535");
+ 		}
+@@ -742,6 +526,8 @@ struct dclist *get_dc_list(unsigned int 
+ 		if (!tmp) {
+ 			char *estr = strerror_r(errno, buf, MAX_ERR_BUF);
+ 			error(logopt, "realloc: %s", estr);
++			if (dcs)
++				free_srv_rrs(dcs, numdcs);
+ 			goto out_error;
+ 		}
+ 
+@@ -755,13 +541,15 @@ struct dclist *get_dc_list(unsigned int 
+ 				strcat(tmp, " ");
+ 			strcat(tmp, lud->lud_scheme);
+ 			strcat(tmp, "://");
+-			strcat(tmp, dcs[i].hostname);
++			strcat(tmp, dcs[i].name);
+ 			if (dcs[i].port > 0) {
+ 				char port[7];
+ 				ret = snprintf(port, 7, ":%d", dcs[i].port);
+ 				if (ret > 6) {
+ 					error(logopt,
+ 					      "invalid port: %u", dcs[i].port);
++					if (dcs)
++						free_srv_rrs(dcs, numdcs);
+ 					goto out_error;
+ 				}
+ 				strcat(tmp, port);
+@@ -771,10 +559,14 @@ struct dclist *get_dc_list(unsigned int 
+ 
+ 		*ludp = lud->lud_next;
+ 		ber_memfree(domain);
++		free_srv_rrs(dcs, numdcs);
+ 	}
+ 
+ 	ldap_free_urldesc(ludlist);
+ 
++	if (!list)
++		goto out_error;
++
+ 	dclist->expire = time(NULL) + min_ttl;
+ 	dclist->uri = list;
+ 

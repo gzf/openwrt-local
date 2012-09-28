@@ -1,0 +1,13 @@
+Index: autofs-5.0.5/daemon/automount.c
+===================================================================
+--- autofs-5.0.5.orig/daemon/automount.c
++++ autofs-5.0.5/daemon/automount.c
+@@ -1844,7 +1844,7 @@
+ 	sigdelset(&block_sigs, SIGILL);
+ 	sigdelset(&block_sigs, SIGFPE);
+ 	sigdelset(&block_sigs, SIGTRAP);
+-	sigprocmask(SIG_BLOCK, &block_sigs, NULL);
++	pthread_sigmask(SIG_BLOCK, &block_sigs, NULL);
+ 
+ 	program = argv[0];
+ 

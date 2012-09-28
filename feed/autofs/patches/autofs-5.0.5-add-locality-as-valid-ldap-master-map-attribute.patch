@@ -1,0 +1,53 @@
+autofs-5.0.5 - add locality as valid ldap master map attribute
+
+From: Ian Kent <raven@themaw.net>
+
+The master map dn string parsing is quite strict so we will need to add
+allowable attributes as required. One such attribute is "l", the locality.
+---
+
+ CHANGELOG        |    1 +
+ lib/master_tok.l |    7 ++++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -33,6 +33,7 @@
+ - fix cache_init() on source re-read.
+ - fix negative cache included map lookup.
+ - remove state machine timed wait.
++- add locality as valid ldap master map attribute.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/lib/master_tok.l
++++ autofs-5.0.5/lib/master_tok.l
+@@ -110,7 +110,8 @@ AT_OU		([oO][[uU])
+ AT_DC		([dD][[cC])
+ AT_O		([oO])
+ AT_C		([cC])
+-DNATTRSTR	({AT_CN}|{AT_NMN}|{AT_AMN}|{AT_OU}|{AT_DC}|{AT_O}|{AT_C})
++AT_L		([lL])
++DNATTRSTR	({AT_CN}|{AT_NMN}|{AT_AMN}|{AT_OU}|{AT_DC}|{AT_O}|{AT_C}|{AT_L})
+ DNNAMESTR1	([[:alnum:]_.\- ]+)
+ DNNAMESTR2	([[:alnum:]_.\-]+)
+ 
+@@ -209,7 +210,7 @@ OPTNTOUT	(-n{OPTWS}|-n{OPTWS}={OPTWS}|--
+ 	}
+ 
+ 	{MTYPE} |
+-	{MTYPE}/{DNSERVERSTR}{DNATTRSTR} |
++	{MTYPE}/{DNSERVERSTR}{DNATTRSTR}= |
+ 	{MTYPE}/{DNATTRSTR}= {
+ 		tlen = master_leng - 1;
+ 		if (bptr != buff && isblank(master_text[tlen])) {
+@@ -249,7 +250,7 @@ OPTNTOUT	(-n{OPTWS}|-n{OPTWS}={OPTWS}|--
+ 		yyless(0);
+ 	}
+ 
+-	{DNSERVERSTR}{DNATTRSTR} {
++	{DNSERVERSTR}{DNATTRSTR}= {
+ 		BEGIN(DNSTR);
+ 		yyless(0);
+ 	}

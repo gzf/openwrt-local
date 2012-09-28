@@ -1,0 +1,119 @@
+autofs-5.0.5 - fix stale map read
+
+From: Ian Kent <raven@themaw.net>
+
+A previous patch to fix direct maps not updating on re-read has
+a side effect of causing maps to always be re-read on lookup.
+This is because, following the application of the previous patch,
+the map stale status is no longer being updated on a successful
+map read.
+---
+
+ CHANGELOG        |    1 +
+ daemon/lookup.c  |    1 +
+ daemon/state.c   |    1 -
+ include/master.h |    1 +
+ lib/master.c     |   37 +++++++++++++++++++++++++------------
+ 5 files changed, 28 insertions(+), 13 deletions(-)
+
+
+--- autofs-5.0.5.orig/CHANGELOG
++++ autofs-5.0.5/CHANGELOG
+@@ -46,6 +46,7 @@
+ - fix direct map not updating on reread.
+ - remove ERR_remove_state() openssl call.
+ - fix next task list update.
++- fix stale map read.
+ 
+ 03/09/2009 autofs-5.0.5
+ -----------------------
+--- autofs-5.0.5.orig/daemon/lookup.c
++++ autofs-5.0.5/daemon/lookup.c
+@@ -1122,6 +1122,7 @@ int lookup_prune_cache(struct autofs_poi
+ 		cache_readlock(map->mc);
+ 		lookup_prune_one_cache(ap, map->mc, age);
+ 		pthread_cleanup_pop(1);
++		clear_stale_instances(map);
+ 		map->stale = 0;
+ 		map = map->next;
+ 	}
+--- autofs-5.0.5.orig/daemon/state.c
++++ autofs-5.0.5/daemon/state.c
+@@ -501,7 +501,6 @@ static void *do_readmap(void *arg)
+ 		pthread_cleanup_pop(1);
+ 		pthread_cleanup_pop(1);
+ 		pthread_cleanup_pop(1);
+-		lookup_prune_cache(ap, now);
+ 	}
+ 
+ 	pthread_cleanup_pop(1);
+--- autofs-5.0.5.orig/include/master.h
++++ autofs-5.0.5/include/master.h
+@@ -88,6 +88,7 @@ struct map_source *
+ master_find_source_instance(struct map_source *, const char *, const char *, int, const char **);
+ struct map_source *
+ master_add_source_instance(struct map_source *, const char *, const char *, time_t, int, const char **);
++void clear_stale_instances(struct map_source *);
+ void send_map_update_request(struct autofs_point *);
+ void master_source_writelock(struct master_mapent *);
+ void master_source_readlock(struct master_mapent *);
+--- autofs-5.0.5.orig/lib/master.c
++++ autofs-5.0.5/lib/master.c
+@@ -464,7 +464,26 @@ master_add_source_instance(struct map_so
+ 	return new;
+ }
+ 
+-static void check_stale_instances(struct map_source *source)
++static int check_stale_instances(struct map_source *source)
++{
++	struct map_source *map;
++
++	if (!source)
++		return 0;
++
++	map = source->instance;
++	while (map) {
++		if (map->stale)
++			return 1;
++		if (check_stale_instances(map))
++			return 1;
++		map = map->next;
++	}
++
++	return 0;
++}
++
++void clear_stale_instances(struct map_source *source)
+ {
+ 	struct map_source *map;
+ 
+@@ -473,11 +492,9 @@ static void check_stale_instances(struct
+ 
+ 	map = source->instance;
+ 	while (map) {
+-		if (map->stale) {
+-			source->stale = 1;
+-			break;
+-		}
+-		check_stale_instances(map->instance);
++		clear_stale_instances(map);
++		if (map->stale)
++			map->stale = 0;
+ 		map = map->next;
+ 	}
+ 
+@@ -495,12 +512,8 @@ void send_map_update_request(struct auto
+ 
+ 	map = ap->entry->maps;
+ 	while (map) {
+-		check_stale_instances(map);
+-		map = map->next;
+-	}
+-
+-	map = ap->entry->maps;
+-	while (map) {
++		if (check_stale_instances(map))
++			map->stale = 1;
+ 		if (map->stale) {
+ 			need_update = 1;
+ 			break;

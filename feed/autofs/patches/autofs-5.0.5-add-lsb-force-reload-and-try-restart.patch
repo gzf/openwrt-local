@@ -1,0 +1,48 @@
+autofs-5.0.5 - add lsb force-reload and try-restart
+
+From: Ian Kent <raven@themaw.net>
+
+LSB specifies two additional init script options, force-reload and
+try-restart. The force-reload option is supposed to do what restart
+does and does that. The try-restart option is essentially condrestart
+and is another option for that action. This change is made only to
+RedHat init script.
+---
+
+ redhat/autofs.init.in |   10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+
+--- autofs-5.0.5.orig/redhat/autofs.init.in
++++ autofs-5.0.5/redhat/autofs.init.in
+@@ -173,7 +173,7 @@ case "$1" in
+ 	status)
+ 		status -p /var/run/autofs.pid -l autofs $prog
+ 		;;
+-	restart)
++	restart|force-reload)
+ 		restart
+ 		;;
+ 	forcerestart)
+@@ -183,19 +183,15 @@ case "$1" in
+ 	reload)
+ 		reload
+ 		;;
+-	condrestart)
++	condrestart|try-restart)
+ 		if [ -f /var/lock/subsys/autofs ]; then
+ 			restart
+ 		fi
+ 		;;
+ 	usage)
+-		echo $"Usage: $0 {start|forcestart|stop|status|restart|forcerestart|reload|condrestart}"
++		echo $"Usage: $0 {start|forcestart|stop|status|restart|force-reload|forcerestart|reload|condrestart|try-restart}"
+ 		exit 0;
+ 		;;
+-	try-restart|force-reload)
+-		echo "$1 service action not supported"
+-		exit 3
+-		;;
+ 	*)
+ 		echo "unknown, invalid or excess argument(s)"
+ 		exit 2
