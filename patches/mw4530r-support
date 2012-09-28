@@ -1,7 +1,7 @@
-Index: trunk/target/linux/ar71xx/base-files/lib/ar71xx.sh
+Index: b/target/linux/ar71xx/base-files/lib/ar71xx.sh
 ===================================================================
---- trunk.orig/target/linux/ar71xx/base-files/lib/ar71xx.sh
-+++ trunk/target/linux/ar71xx/base-files/lib/ar71xx.sh
+--- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
++++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
 @@ -132,6 +132,9 @@
  	"431000"*)
  		model="TP-Link TL-WDR4310"
@@ -12,10 +12,10 @@ Index: trunk/target/linux/ar71xx/base-files/lib/ar71xx.sh
  	*)
  		hwver=""
  		;;
-Index: trunk/target/linux/ar71xx/generic/profiles/mercury.mk
+Index: b/target/linux/ar71xx/generic/profiles/mercury.mk
 ===================================================================
 --- /dev/null
-+++ trunk/target/linux/ar71xx/generic/profiles/mercury.mk
++++ b/target/linux/ar71xx/generic/profiles/mercury.mk
 @@ -0,0 +1,19 @@
 +#
 +# Copyright (C) 2009 OpenWrt.org
@@ -36,10 +36,10 @@ Index: trunk/target/linux/ar71xx/generic/profiles/mercury.mk
 +endef
 +$(eval $(call Profile,MCMW4530R))
 +
-Index: trunk/target/linux/ar71xx/image/Makefile
+Index: b/target/linux/ar71xx/image/Makefile
 ===================================================================
---- trunk.orig/target/linux/ar71xx/image/Makefile
-+++ trunk/target/linux/ar71xx/image/Makefile
+--- a/target/linux/ar71xx/image/Makefile
++++ b/target/linux/ar71xx/image/Makefile
 @@ -831,6 +831,8 @@
  $(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),TLWDR4300V1,tl-wdr4300-v1,TL-WDR4300,ttyS0,115200,0x43000001,1,8Mlzma))
  $(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),TLWDR4310V1,tl-wdr4310-v1,TL-WDR4300,ttyS0,115200,0x43100001,1,8Mlzma))

@@ -1,7 +1,7 @@
-Index: trunk/feeds/packages/utils/vim/Makefile
+Index: b/feeds/packages/utils/vim/Makefile
 ===================================================================
---- trunk.orig/feeds/packages/utils/vim/Makefile
-+++ trunk/feeds/packages/utils/vim/Makefile
+--- a/feeds/packages/utils/vim/Makefile
++++ b/feeds/packages/utils/vim/Makefile
 @@ -35,6 +35,11 @@
    TITLE+= (Tiny)
  endef
@@ -87,10 +87,10 @@ Index: trunk/feeds/packages/utils/vim/Makefile
  $(eval $(call BuildPackage,vim-full))
  $(eval $(call BuildPackage,vim-runtime))
  $(eval $(call BuildPackage,vim-help))
-Index: trunk/feeds/packages/utils/vim/files/vimrc.small
+Index: b/feeds/packages/utils/vim/files/vimrc.small
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/vim/files/vimrc.small
++++ b/feeds/packages/utils/vim/files/vimrc.small
 @@ -0,0 +1,2 @@
 +set nocompatible
 +set encoding=utf-8

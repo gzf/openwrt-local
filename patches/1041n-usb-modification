@@ -1,7 +1,7 @@
-Index: trunk/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
+Index: b/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
 ===================================================================
---- trunk.orig/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
-+++ trunk/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
+--- a/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
 @@ -24,6 +24,7 @@
  #include "dev-leds-gpio.h"
  #include "dev-m25p80.h"
@@ -19,10 +19,10 @@ Index: trunk/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
  }
  
  MIPS_MACHINE(ATH79_MACH_TL_WR1041N_V2, "TL-WR1041N-v2",
-Index: trunk/target/linux/ar71xx/generic/profiles/tp-link.mk
+Index: b/target/linux/ar71xx/generic/profiles/tp-link.mk
 ===================================================================
---- trunk.orig/target/linux/ar71xx/generic/profiles/tp-link.mk
-+++ trunk/target/linux/ar71xx/generic/profiles/tp-link.mk
+--- a/target/linux/ar71xx/generic/profiles/tp-link.mk
++++ b/target/linux/ar71xx/generic/profiles/tp-link.mk
 @@ -173,7 +173,7 @@
  
  define Profile/TLWR1041

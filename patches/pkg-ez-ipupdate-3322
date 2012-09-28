@@ -1,7 +1,7 @@
-Index: trunk/feeds/packages/net/ez-ipupdate-3322/Makefile
+Index: b/feeds/packages/net/ez-ipupdate-3322/Makefile
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/net/ez-ipupdate-3322/Makefile
++++ b/feeds/packages/net/ez-ipupdate-3322/Makefile
 @@ -0,0 +1,54 @@
 +# 
 +# Author: Zhifeng Gu <guzhifeng1979@hotmail.com>
@@ -57,10 +57,10 @@ Index: trunk/feeds/packages/net/ez-ipupdate-3322/Makefile
 +endef
 +
 +$(eval $(call BuildPackage,ez-ipupdate-3322))
-Index: trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.config
+Index: b/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.config
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.config
++++ b/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.config
 @@ -0,0 +1,14 @@
 +
 +config ddns
@@ -76,10 +76,10 @@ Index: trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.config
 +#       option interface wan
 +#       option program ez-ipupdate
 +#       option config /etc/ez-ipupdate.conf
-Index: trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.hotplug
+Index: b/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.hotplug
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.hotplug
++++ b/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.hotplug
 @@ -0,0 +1,83 @@
 +NAME=ez-ipupdate
 +COMMAND=/usr/sbin/$NAME
@@ -164,10 +164,10 @@ Index: trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.hotplug
 +	config_foreach ddns ddns
 +	;;
 +esac
-Index: trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.init
+Index: b/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.init
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.init
++++ b/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.init
 @@ -0,0 +1,18 @@
 +#!/bin/sh /etc/rc.common
 +# Copyright (C) 2006 OpenWrt.org
@@ -187,10 +187,10 @@ Index: trunk/feeds/packages/net/ez-ipupdate-3322/files/ez-ipupdate.init
 +stop() {
 +	[ -f $PID_F ] && kill $(cat $PID_F)
 +}
-Index: trunk/feeds/packages/net/ez-ipupdate-3322/patches/fix-am
+Index: b/feeds/packages/net/ez-ipupdate-3322/patches/fix-am
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/net/ez-ipupdate-3322/patches/fix-am
++++ b/feeds/packages/net/ez-ipupdate-3322/patches/fix-am
 @@ -0,0 +1,13 @@
 +Index: ez-ipupdate-3322-3.0.10/Makefile.am
 +===================================================================
@@ -205,10 +205,10 @@ Index: trunk/feeds/packages/net/ez-ipupdate-3322/patches/fix-am
 + 
 + EXTRA_DIST = getpass.c ez-ipupdate.lsm example.conf example-pgpow.conf example-dhs.conf example-dyndns.conf example-ods.conf example-tzo.conf example-gnudip.conf example-easydns.conf example-justlinux.conf example-dyns.conf CHANGELOG mkbinary
 + 
-Index: trunk/feeds/packages/net/ez-ipupdate-3322/patches/fix-errno-ref
+Index: b/feeds/packages/net/ez-ipupdate-3322/patches/fix-errno-ref
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/net/ez-ipupdate-3322/patches/fix-errno-ref
++++ b/feeds/packages/net/ez-ipupdate-3322/patches/fix-errno-ref
 @@ -0,0 +1,21 @@
 +Index: ez-ipupdate-3322-3.0.10/conf_file.c
 +===================================================================
@@ -231,10 +231,10 @@ Index: trunk/feeds/packages/net/ez-ipupdate-3322/patches/fix-errno-ref
 + #  define error_string (sys_errlist[errno])
 + #else
 + #  define error_string "error message not found"
-Index: trunk/feeds/packages/net/ez-ipupdate-3322/patches/series
+Index: b/feeds/packages/net/ez-ipupdate-3322/patches/series
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/net/ez-ipupdate-3322/patches/series
++++ b/feeds/packages/net/ez-ipupdate-3322/patches/series
 @@ -0,0 +1,2 @@
 +fix-am
 +fix-errno-ref

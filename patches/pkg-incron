@@ -1,7 +1,7 @@
-Index: trunk/feeds/packages/utils/incron/Makefile
+Index: b/feeds/packages/utils/incron/Makefile
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/incron/Makefile
++++ b/feeds/packages/utils/incron/Makefile
 @@ -0,0 +1,59 @@
 +# 
 +# Copyright (C) 2006-2010 OpenWrt.org
@@ -62,17 +62,17 @@ Index: trunk/feeds/packages/utils/incron/Makefile
 +endef
 +
 +$(eval $(call BuildPackage,incron))
-Index: trunk/feeds/packages/utils/incron/files/incron.conf
+Index: b/feeds/packages/utils/incron/files/incron.conf
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/incron/files/incron.conf
++++ b/feeds/packages/utils/incron/files/incron.conf
 @@ -0,0 +1,2 @@
 +# incron config for OpenWRT
 +user_table_dir = /etc/incrontabs
-Index: trunk/feeds/packages/utils/incron/files/incron.init
+Index: b/feeds/packages/utils/incron/files/incron.init
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/incron/files/incron.init
++++ b/feeds/packages/utils/incron/files/incron.init
 @@ -0,0 +1,16 @@
 +#!/bin/sh /etc/rc.common
 +#
@@ -90,10 +90,10 @@ Index: trunk/feeds/packages/utils/incron/files/incron.init
 +stop() {
 +    incrond -k
 +}
-Index: trunk/feeds/packages/utils/incron/patches/remove-argp
+Index: b/feeds/packages/utils/incron/patches/remove-argp
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/incron/patches/remove-argp
++++ b/feeds/packages/utils/incron/patches/remove-argp
 @@ -0,0 +1,13 @@
 +Index: incron-0.5.10/ict-main.cpp
 +===================================================================
@@ -108,18 +108,18 @@ Index: trunk/feeds/packages/utils/incron/patches/remove-argp
 + #include <pwd.h>
 + #include <string>
 + #include <unistd.h>
-Index: trunk/feeds/packages/utils/incron/patches/series
+Index: b/feeds/packages/utils/incron/patches/series
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/incron/patches/series
++++ b/feeds/packages/utils/incron/patches/series
 @@ -0,0 +1,3 @@
 +remove-argp
 +use-access-instead-of-euidaccess
 +compile-against-uclibc++
-Index: trunk/feeds/packages/utils/incron/patches/use-access-instead-of-euidaccess
+Index: b/feeds/packages/utils/incron/patches/use-access-instead-of-euidaccess
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/incron/patches/use-access-instead-of-euidaccess
++++ b/feeds/packages/utils/incron/patches/use-access-instead-of-euidaccess
 @@ -0,0 +1,13 @@
 +Index: incron-0.5.10/ict-main.cpp
 +===================================================================
@@ -134,10 +134,10 @@ Index: trunk/feeds/packages/utils/incron/patches/use-access-instead-of-euidacces
 +         perror("cannot read configuration file (will use default)");
 +       }
 +     }
-Index: trunk/feeds/packages/utils/incron/patches/compile-against-uclibc++
+Index: b/feeds/packages/utils/incron/patches/compile-against-uclibc++
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/incron/patches/compile-against-uclibc++
++++ b/feeds/packages/utils/incron/patches/compile-against-uclibc++
 @@ -0,0 +1,12 @@
 +Index: incron-0.5.10/icd-main.cpp
 +===================================================================

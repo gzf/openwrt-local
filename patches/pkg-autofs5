@@ -1,7 +1,7 @@
-Index: trunk/feeds/packages/utils/autofs/Makefile
+Index: b/feeds/packages/utils/autofs/Makefile
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/Makefile
++++ b/feeds/packages/utils/autofs/Makefile
 @@ -0,0 +1,101 @@
 +#
 +# Author: Zhifeng Gu <guzhifeng1979@hotmail.com> 
@@ -104,10 +104,10 @@ Index: trunk/feeds/packages/utils/autofs/Makefile
 +
 +$(eval $(call BuildPackage,autofs5))
 +$(eval $(call BuildPackage,autofs5-mount-ext2))
-Index: trunk/feeds/packages/utils/autofs/patches/200-fix-configure-not-run-when-cross-compiling
+Index: b/feeds/packages/utils/autofs/patches/200-fix-configure-not-run-when-cross-compiling
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/200-fix-configure-not-run-when-cross-compiling
++++ b/feeds/packages/utils/autofs/patches/200-fix-configure-not-run-when-cross-compiling
 @@ -0,0 +1,13 @@
 +Index: autofs-5.0.5/configure.in
 +===================================================================
@@ -122,10 +122,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/200-fix-configure-not-run-when-
 + 	      [gcc_supports_pie=yes], [gcc_supports_pie=no])
 + AC_MSG_RESULT([$gcc_supports_pie])
 + if test $gcc_supports_pie = yes ; then
-Index: trunk/feeds/packages/utils/autofs/patches/202-disable-yp-lookup
+Index: b/feeds/packages/utils/autofs/patches/202-disable-yp-lookup
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/202-disable-yp-lookup
++++ b/feeds/packages/utils/autofs/patches/202-disable-yp-lookup
 @@ -0,0 +1,40 @@
 +Index: autofs-5.0.5/modules/Makefile
 +===================================================================
@@ -167,10 +167,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/202-disable-yp-lookup
 + #include <errno.h>
 + #include <sys/ioctl.h>
 + #include <ctype.h>
-Index: trunk/feeds/packages/utils/autofs/patches/203-disable-ldap-code-in-defaults
+Index: b/feeds/packages/utils/autofs/patches/203-disable-ldap-code-in-defaults
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/203-disable-ldap-code-in-defaults
++++ b/feeds/packages/utils/autofs/patches/203-disable-ldap-code-in-defaults
 @@ -0,0 +1,46 @@
 +--- a/lib/defaults.c	2011-06-28 15:34:35.000000000 +0800
 ++++ b/lib/defaults.c	2012-02-28 16:46:53.000000000 +0800
@@ -218,10 +218,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/203-disable-ldap-code-in-defaul
 + 
 + unsigned int defaults_get_mount_nfs_default_proto(void)
 + {
-Index: trunk/feeds/packages/utils/autofs/patches/205-fix-install-symlinks
+Index: b/feeds/packages/utils/autofs/patches/205-fix-install-symlinks
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/205-fix-install-symlinks
++++ b/feeds/packages/utils/autofs/patches/205-fix-install-symlinks
 @@ -0,0 +1,15 @@
 +Index: autofs-5.0.5/modules/Makefile
 +===================================================================
@@ -238,10 +238,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/205-fix-install-symlinks
 + 	ln -fs mount_nfs.so $(INSTALLROOT)$(autofslibdir)/mount_nfs4.so
 + ifeq ($(EXT2FS), 1)
 +  ifeq ($(EXT3FS), 1)
-Index: trunk/feeds/packages/utils/autofs/patches/201-uclibc-compat
+Index: b/feeds/packages/utils/autofs/patches/201-uclibc-compat
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/201-uclibc-compat
++++ b/feeds/packages/utils/autofs/patches/201-uclibc-compat
 @@ -0,0 +1,11 @@
 +--- a/include/rpc_subs.h	2011-06-28 15:34:35.000000000 +0800
 ++++ b/include/rpc_subs.h	2012-02-28 15:42:51.000000000 +0800
@@ -254,10 +254,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/201-uclibc-compat
 + #include <linux/nfs2.h>
 + #include <linux/nfs3.h>
 + 
-Index: trunk/feeds/packages/utils/autofs/files/autofs.init
+Index: b/feeds/packages/utils/autofs/files/autofs.init
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/files/autofs.init
++++ b/feeds/packages/utils/autofs/files/autofs.init
 @@ -0,0 +1,80 @@
 +#!/bin/sh /etc/rc.common
 +#
@@ -339,10 +339,10 @@ Index: trunk/feeds/packages/utils/autofs/files/autofs.init
 +        start_daemon
 +    fi
 +}
-Index: trunk/feeds/packages/utils/autofs/files/50-autofs
+Index: b/feeds/packages/utils/autofs/files/50-autofs
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/files/50-autofs
++++ b/feeds/packages/utils/autofs/files/50-autofs
 @@ -0,0 +1,13 @@
 +#!/bin/sh
 +# Author: Zhifeng Gu <guzhifeng1979@hotmail.com>
@@ -357,10 +357,10 @@ Index: trunk/feeds/packages/utils/autofs/files/50-autofs
 +        reload_config
 +    fi
 +fi
-Index: trunk/feeds/packages/utils/autofs/files/autofs.conf
+Index: b/feeds/packages/utils/autofs/files/autofs.conf
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/files/autofs.conf
++++ b/feeds/packages/utils/autofs/files/autofs.conf
 @@ -0,0 +1,13 @@
 +config automount global
 +       option timeout   300
@@ -375,10 +375,10 @@ Index: trunk/feeds/packages/utils/autofs/files/autofs.conf
 +#       option mountpoint   /home
 +#       option maptype      file
 +#       option map          /etc/auto.home
-Index: trunk/feeds/packages/utils/autofs/files/direct.fstab
+Index: b/feeds/packages/utils/autofs/files/direct.fstab
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/files/direct.fstab
++++ b/feeds/packages/utils/autofs/files/direct.fstab
 @@ -0,0 +1,49 @@
 +#!/bin/sh
 +# Author: Zhifeng Gu <guzhifeng1979@hotmail.com>
@@ -429,10 +429,10 @@ Index: trunk/feeds/packages/utils/autofs/files/direct.fstab
 +
 +config_load fstab
 +config_foreach direct_mount mount
-Index: trunk/feeds/packages/utils/autofs/patches/206-disable-parsing-nsswitch
+Index: b/feeds/packages/utils/autofs/patches/206-disable-parsing-nsswitch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/206-disable-parsing-nsswitch
++++ b/feeds/packages/utils/autofs/patches/206-disable-parsing-nsswitch
 @@ -0,0 +1,33 @@
 +--- a/lib/nsswitch.c	2011-06-28 15:34:35.000000000 +0800
 ++++ b/lib/nsswitch.c	2012-03-04 00:03:06.000000000 +0800
@@ -467,10 +467,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/206-disable-parsing-nsswitch
 + 	defaults.o parse_subs.o dev-ioctl-lib.o
 + 
 + YACCSRC = nss_tok.c nss_parse.tab.c nss_parse.tab.h \
-Index: trunk/feeds/packages/utils/autofs/patches/207-make-runtime-dep-commands-configurable
+Index: b/feeds/packages/utils/autofs/patches/207-make-runtime-dep-commands-configurable
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/207-make-runtime-dep-commands-configurable
++++ b/feeds/packages/utils/autofs/patches/207-make-runtime-dep-commands-configurable
 @@ -0,0 +1,59 @@
 +Index: autofs-5.0.5/aclocal.m4
 +===================================================================
@@ -531,10 +531,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/207-make-runtime-dep-commands-c
 + 
 + AF_CHECK_PROG(LEX, flex lex, , $searchpath)
 + AF_CHECK_PROG(YACC, bison, , $searchpath)
-Index: trunk/feeds/packages/utils/autofs/patches/208-dynamic-lookup-file
+Index: b/feeds/packages/utils/autofs/patches/208-dynamic-lookup-file
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/208-dynamic-lookup-file
++++ b/feeds/packages/utils/autofs/patches/208-dynamic-lookup-file
 @@ -0,0 +1,136 @@
 +Index: autofs-5.0.5/modules/lookup_file.c
 +===================================================================
@@ -672,10 +672,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/208-dynamic-lookup-file
 + 	if (!f) {
 + 		error(ap->logopt,
 + 		      MODPREFIX "could not open map file %s", ctxt->mapname);
-Index: trunk/feeds/packages/utils/autofs/files/autofs.sh
+Index: b/feeds/packages/utils/autofs/files/autofs.sh
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/files/autofs.sh
++++ b/feeds/packages/utils/autofs/files/autofs.sh
 @@ -0,0 +1,19 @@
 +#!/bin/sh
 +#
@@ -696,10 +696,10 @@ Index: trunk/feeds/packages/utils/autofs/files/autofs.sh
 +reload_config() {
 +    kill -HUP `cat $AUTOMOUNT_PIDFILE`
 +}
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.4-add-mount-wait-parameter.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.4-add-mount-wait-parameter.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.4-add-mount-wait-parameter.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.4-add-mount-wait-parameter.patch
 @@ -0,0 +1,172 @@
 +autofs-5.0.4 - add mount wait parameter
 +
@@ -873,10 +873,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.4-add-mount-wait-par
 + # UMOUNT_WAIT - time to wait for a response from umount(8).
 + #
 + #UMOUNT_WAIT=12
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-autofs_ldap_auth_conf-man-page.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-autofs_ldap_auth_conf-man-page.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-autofs_ldap_auth_conf-man-page.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-autofs_ldap_auth_conf-man-page.patch
 @@ -0,0 +1,242 @@
 +autofs-5.0.5 - add autofs_ldap_auth.conf man page
 +
@@ -1120,10 +1120,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-autofs_ldap_au
 + -->
 + 
 + <autofs_ldap_sasl_conf
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-base64-password-encode.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-base64-password-encode.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-base64-password-encode.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-base64-password-encode.patch
 @@ -0,0 +1,368 @@
 +autofs-5.0.5 - add base64 password encode
 +
@@ -1493,10 +1493,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-base64-passwor
 + 	} else if (auth_required == LDAP_AUTH_REQUIRED &&
 + 		  (authtype && !strncmp(authtype, "EXTERNAL", 8))) {
 + 		ret = get_property(logopt, root, "external_cert",  &extern_cert);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-dump-maps-option.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-dump-maps-option.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-dump-maps-option.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-dump-maps-option.patch
 @@ -0,0 +1,354 @@
 +autofs-5.0.5 - add dump maps option
 +
@@ -1852,10 +1852,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-dump-maps-opti
 + .I "\-O, \-\-global-options"
 + Allows the specification of global mount options used for all master
 + map entries. These options will either replace or be appened to options
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-external-bind-method.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-external-bind-method.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-external-bind-method.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-external-bind-method.patch
 @@ -0,0 +1,404 @@
 +autofs-5.0.5 - add external bind method
 +
@@ -2261,10 +2261,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-external-bind-
 + 	free(ctxt);
 + 
 + 	return;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-locality-as-valid-ldap-master-map-attribute.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-locality-as-valid-ldap-master-map-attribute.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-locality-as-valid-ldap-master-map-attribute.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-locality-as-valid-ldap-master-map-attribute.patch
 @@ -0,0 +1,53 @@
 +autofs-5.0.5 - add locality as valid ldap master map attribute
 +
@@ -2319,10 +2319,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-locality-as-va
 + 		BEGIN(DNSTR);
 + 		yyless(0);
 + 	}
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-lsb-force-reload-and-try-restart.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-lsb-force-reload-and-try-restart.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-lsb-force-reload-and-try-restart.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-lsb-force-reload-and-try-restart.patch
 @@ -0,0 +1,48 @@
 +autofs-5.0.5 - add lsb force-reload and try-restart
 +
@@ -2372,10 +2372,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-lsb-force-relo
 + 	*)
 + 		echo "unknown, invalid or excess argument(s)"
 + 		exit 2
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-sasl-mutex-callbacks.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-sasl-mutex-callbacks.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-sasl-mutex-callbacks.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-sasl-mutex-callbacks.patch
 @@ -0,0 +1,98 @@
 +autofs-5.0.5 - add sasl mutex callbacks
 +
@@ -2475,10 +2475,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-sasl-mutex-cal
 + 	/* Start up Cyrus SASL--only needs to be done at library load. */
 + 	if (sasl_client_init(callbacks) != SASL_OK) {
 + 		error(logopt, "sasl_client_init failed");
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-simple-bind-auth.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-simple-bind-auth.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-simple-bind-auth.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-simple-bind-auth.patch
 @@ -0,0 +1,120 @@
 +autofs-5.0.5 - add simple bind authentication
 +
@@ -2600,10 +2600,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-add-simple-bind-au
 + .TP
 + \fBauthtype="GSSAPI"|"LOGIN"|"PLAIN"|"ANONYMOUS"|"DIGEST-MD5|EXTERNAL"\fP
 + This attribute can be used to specify a preferred authentication mechanism.
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-always-read-file-maps-mount-lookup-map-read-fix.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-always-read-file-maps-mount-lookup-map-read-fix.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-always-read-file-maps-mount-lookup-map-read-fix.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-always-read-file-maps-mount-lookup-map-read-fix.patch
 @@ -0,0 +1,44 @@
 +autofs-5.0.5 - always read file maps mount lookup map read fix
 +
@@ -2649,10 +2649,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-always-read-file-m
 + 	status = pthread_mutex_lock(&instance_mutex);
 + 	if (status)
 + 		fatal(status);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-auto-adjust-ldap-page-size.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-auto-adjust-ldap-page-size.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-auto-adjust-ldap-page-size.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-auto-adjust-ldap-page-size.patch
 @@ -0,0 +1,113 @@
 +autofs-5.0.5 - auto adjust ldap page size
 +
@@ -2767,10 +2767,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-auto-adjust-ldap-p
 + 			continue;
 + 		}
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-automount-8-man-page-correction.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-automount-8-man-page-correction.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-automount-8-man-page-correction.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-automount-8-man-page-correction.patch
 @@ -0,0 +1,33 @@
 +autofs-5.0.5 - automount(8) man page correction
 +
@@ -2805,10 +2805,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-automount-8-man-pa
 + .hy
 + map and sets up mount points for each entry in the master map allowing
 + them to be automatically mounted when accessed. The file systems are
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-each-dc-server.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-each-dc-server.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-each-dc-server.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-each-dc-server.patch
 @@ -0,0 +1,199 @@
 +autofs-5.0.5 - check each dc server
 +
@@ -3009,10 +3009,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-each-dc-serv
 + 	ldap = find_server(logopt, ctxt);
 + 	if (!ldap)
 + 		error(logopt, MODPREFIX "failed to find available server");
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-for-path-mount-location-in-generic-module.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-for-path-mount-location-in-generic-module.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-for-path-mount-location-in-generic-module.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-for-path-mount-location-in-generic-module.patch
 @@ -0,0 +1,113 @@
 +autofs-5.0.5 - check for path mount location in generic module
 +
@@ -3127,10 +3127,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-check-for-path-mou
 + 		}
 + 		p++;
 + 	}
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-check-null-cache-on-expire.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-check-null-cache-on-expire.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-check-null-cache-on-expire.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-check-null-cache-on-expire.patch
 @@ -0,0 +1,48 @@
 +autofs-5.0.5 - dont check null cache on expire
 +
@@ -3180,10 +3180,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-check-null-ca
 + 	is_autofs_fs = 0;
 + 	if (master_find_submount(ap, path))
 + 		is_autofs_fs = 1;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-connect-at-ldap-lookup-module-init.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-connect-at-ldap-lookup-module-init.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-connect-at-ldap-lookup-module-init.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-connect-at-ldap-lookup-module-init.patch
 @@ -0,0 +1,196 @@
 +autofs-5.0.5 - dont connect at ldap lookup module init
 +
@@ -3381,10 +3381,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-connect-at-ld
 + 	debug(ap->logopt,
 + 	      MODPREFIX "searching for \"%s\" under \"%s\"", query, ctxt->qdn);
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-fail-mount-on-access-fail.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-fail-mount-on-access-fail.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-fail-mount-on-access-fail.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-fail-mount-on-access-fail.patch
 @@ -0,0 +1,55 @@
 +autofs-5.0.5 - dont fail mount on access fail
 +
@@ -3441,10 +3441,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-fail-mount-on
 + 
 + 			seteuid(0);
 + 			setegid(0);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-hold-lock-for-simple-mounts.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-hold-lock-for-simple-mounts.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-hold-lock-for-simple-mounts.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-hold-lock-for-simple-mounts.patch
 @@ -0,0 +1,117 @@
 +autofs-5.0.5 - don't hold lock for simple mounts
 +
@@ -3563,10 +3563,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-hold-lock-for
 + 		pthread_setcancelstate(cur_state, NULL);
 + 	}
 + 	return rv;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-use-master_lex_destroy-to-clear-parse-buffer.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-use-master_lex_destroy-to-clear-parse-buffer.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-use-master_lex_destroy-to-clear-parse-buffer.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-use-master_lex_destroy-to-clear-parse-buffer.patch
 @@ -0,0 +1,39 @@
 +autofs-5.0.5 - don't use master_lex_destroy() to clear parse buffer
 +
@@ -3607,10 +3607,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-dont-use-master_le
 + 	optr = buff;
 + 
 + 	line = buffer;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-add-simple-bind-auth.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-add-simple-bind-auth.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-add-simple-bind-auth.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-add-simple-bind-auth.patch
 @@ -0,0 +1,61 @@
 +autofs-5.0.5 - fix add simple bind auth
 +
@@ -3673,10 +3673,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-add-simple-bin
 + 
 + #define MODULE_LOOKUP
 + #include "automount.h"
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ampersand-escape-in-auto-smb.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ampersand-escape-in-auto-smb.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ampersand-escape-in-auto-smb.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ampersand-escape-in-auto-smb.patch
 @@ -0,0 +1,32 @@
 +autofs-5.0.5 - fix ampersand escape in auto.smb
 +
@@ -3710,10 +3710,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ampersand-esca
 + 		  print " \\\n\t \"/" dir "\"", "\"://" key "/" loc "\""
 + 		}
 + 	END 	{ if (!first) print "\n"; else exit 1 }
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-backwards-ifndef-INET6.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-backwards-ifndef-INET6.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-backwards-ifndef-INET6.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-backwards-ifndef-INET6.patch
 @@ -0,0 +1,48 @@
 +autofs-5.0.5 - fix backwards #ifndef INET6
 +
@@ -3763,10 +3763,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-backwards-ifnd
 + 			if (host_addr->sa_family == AF_INET)
 + 				break;
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-cache_init-on-source-re-read.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-cache_init-on-source-re-read.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-cache_init-on-source-re-read.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-cache_init-on-source-re-read.patch
 @@ -0,0 +1,109 @@
 +autofs-5.0.5 - fix cache_init() on source re-read
 +
@@ -3877,10 +3877,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-cache_init-on-
 + 		last = NULL;
 + 		next = entry->maps;
 + 		while (next) {
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-direct-map-not-updating-on-reread.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-direct-map-not-updating-on-reread.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-direct-map-not-updating-on-reread.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-direct-map-not-updating-on-reread.patch
 @@ -0,0 +1,40 @@
 +autofs-5.0.5 - fix direct map not updating on reread
 +
@@ -3922,10 +3922,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-direct-map-not
 + 
 + 	/*
 + 	 * For maps that don't support enumeration return success
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-disable-timeout.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-disable-timeout.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-disable-timeout.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-disable-timeout.patch
 @@ -0,0 +1,35 @@
 +autofs-5.0.5 - fix disable timeout
 +
@@ -3962,10 +3962,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-disable-timeou
 + 	new = malloc(sizeof(struct alarm));
 + 	if (!new)
 + 		return 0;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ext4-fsck-at-mount.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ext4-fsck-at-mount.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ext4-fsck-at-mount.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ext4-fsck-at-mount.patch
 @@ -0,0 +1,208 @@
 +autofs-5.0.5 - fix ext4 fsck at mount
 +
@@ -4175,10 +4175,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-ext4-fsck-at-m
 + #endif
 + 	if (ro) {
 + 		debug(ap->logopt,
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-get-qdn-fail.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-get-qdn-fail.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-get-qdn-fail.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-get-qdn-fail.patch
 @@ -0,0 +1,39 @@
 +autofs-5.0.5 - fix get query dn failure
 +
@@ -4219,10 +4219,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-get-qdn-fail.p
 + 		return 1;
 + 
 + 	/*
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-included-map-read-fail-handling.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-included-map-read-fail-handling.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-included-map-read-fail-handling.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-included-map-read-fail-handling.patch
 @@ -0,0 +1,44 @@
 +autofs-5.0.5 - fix included map read fail handling
 +
@@ -4268,10 +4268,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-included-map-r
 + 			}
 + 			master->depth--;
 + 			master->recurse = 0;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-isspace-wild-card-substition.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-isspace-wild-card-substition.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-isspace-wild-card-substition.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-isspace-wild-card-substition.patch
 @@ -0,0 +1,78 @@
 +autofs-5.0.5 - fix isspace() wild card substition
 +
@@ -4351,10 +4351,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-isspace-wild-c
 + 				}
 + 			}
 + 			len += l;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-libxml2-workaround-configure.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-libxml2-workaround-configure.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-libxml2-workaround-configure.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-libxml2-workaround-configure.patch
 @@ -0,0 +1,79 @@
 +autofs-5.0.5 - fix libxml2 workaround configure
 +
@@ -4435,10 +4435,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-libxml2-workar
 + 	if (dh_xml2) {
 + 		xmlCleanupParser();
 + 		dlclose(dh_xml2);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-map-source-check-in-file-lookup.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-map-source-check-in-file-lookup.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-map-source-check-in-file-lookup.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-map-source-check-in-file-lookup.patch
 @@ -0,0 +1,66 @@
 +autofs-5.0.5 - fix map source check in file lookup
 +
@@ -4506,10 +4506,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-map-source-che
 + 		while ((me = cache_lookup_key_next(me)))
 + 			if (me->source == source)
 + 				break;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-negative-cache-included-map-lookup.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-negative-cache-included-map-lookup.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-negative-cache-included-map-lookup.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-negative-cache-included-map-lookup.patch
 @@ -0,0 +1,49 @@
 +autofs-5.0.5 - fix negative cache included map lookup
 +
@@ -4560,10 +4560,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-negative-cache
 + 
 + 		/* Doesn't exist in any source, just add it somewhere */
 + 		if (source)
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-next-task-list-update.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-next-task-list-update.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-next-task-list-update.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-next-task-list-update.patch
 @@ -0,0 +1,44 @@
 +autofs-5.0.5 - fix next task list update
 +
@@ -4609,10 +4609,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-next-task-list
 + 			}
 + 
 + 			if (list_empty(head))
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-clean.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-clean.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-clean.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-clean.patch
 @@ -0,0 +1,36 @@
 +autofs-5.0.5 - fix null cache clean
 +
@@ -4650,10 +4650,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-cle
 + 	}
 + 
 + 	return;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-deadlock.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-deadlock.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-deadlock.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-deadlock.patch
 @@ -0,0 +1,33 @@
 +autofs-5.0.5 - fix null cache deadlock
 +
@@ -4688,10 +4688,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-dea
 + 		map = ap->entry->maps;
 + 		while (map) {
 + 			/* Is map source up to date or no longer valid */
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-race.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-race.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-race.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-race.patch
 @@ -0,0 +1,189 @@
 +autofs-5.0.5 - fix null cache race
 +
@@ -4882,10 +4882,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-null-cache-rac
 + 
 + 	if (debug || verbose) {
 + 		logopt = (debug ? LOGOPT_DEBUG : 0);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-paged-ldap-map-read.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-paged-ldap-map-read.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-paged-ldap-map-read.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-paged-ldap-map-read.patch
 @@ -0,0 +1,57 @@
 +autofs-5.0.5 - fix paged ldap map read
 +
@@ -4944,10 +4944,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-paged-ldap-map
 + 				unbind_ldap_connection(ap->logopt, sp.ldap, ctxt);
 + 				*result_ldap = rv;
 + 				free(sp.query);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-parse_sun-module-init.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-parse_sun-module-init.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-parse_sun-module-init.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-parse_sun-module-init.patch
 @@ -0,0 +1,107 @@
 +autofs-5.0.5 - fix parse_sun() module init
 +
@@ -5056,10 +5056,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-parse_sun-modu
 + 	if (ctxt)
 + 		kill_context(ctxt);
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-pidof-init-script-usage.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-pidof-init-script-usage.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-pidof-init-script-usage.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-pidof-init-script-usage.patch
 @@ -0,0 +1,91 @@
 +autofs-5.0.5 - fix pidof init script usage
 +
@@ -5152,10 +5152,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-pidof-init-scr
 + 	if [ -z $pid ]; then
 + 		echo $"$prog not running"
 + 		RETVAL=1
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-prune-cache-valid-check.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-prune-cache-valid-check.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-prune-cache-valid-check.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-prune-cache-valid-check.patch
 @@ -0,0 +1,42 @@
 +autofs-5.0.5 - fix prune cache valid check
 +
@@ -5199,10 +5199,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-prune-cache-va
 + 		if (!valid &&
 + 		    is_mounted(_PATH_MOUNTED, path, MNTS_REAL)) {
 + 			debug(ap->logopt,
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-for-host-on-different-network.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-for-host-on-different-network.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-for-host-on-different-network.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-for-host-on-different-network.patch
 @@ -0,0 +1,137 @@
 +autofs-5.0.5 - fix random selection for host on different network
 +
@@ -5341,10 +5341,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selecti
 + 					p = next;
 + 					continue;
 + 				}
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-option.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-option.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-option.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selection-option.patch
 @@ -0,0 +1,35 @@
 +autofs-5.0.5 - fix random selection option
 +
@@ -5381,10 +5381,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-random-selecti
 + 	if (negative_timeout)
 + 		entry->ap->negative_timeout = negative_timeout;
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-reconnect-get-base-dn.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-reconnect-get-base-dn.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-reconnect-get-base-dn.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-reconnect-get-base-dn.patch
 @@ -0,0 +1,37 @@
 +autofs-5.0.5 - fix reconnect get base dn
 +
@@ -5423,10 +5423,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-reconnect-get-
 + 		return 1;
 + 
 + 	/*
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-remount-locking.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-remount-locking.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-remount-locking.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-remount-locking.patch
 @@ -0,0 +1,365 @@
 +autofs-5.0.5 - fix remount locking
 +
@@ -5793,10 +5793,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-remount-lockin
 + 	}
 + 
 + 	 /*
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-restart.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-restart.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-restart.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-restart.patch
 @@ -0,0 +1,34 @@
 +autofs-5.0.5 - fix restart
 +
@@ -5832,10 +5832,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-restart.patch
 + 	if [ $? -eq 0 ]; then
 + 		stop
 + 	fi
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-rpc-large-export-list.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-rpc-large-export-list.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-rpc-large-export-list.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-rpc-large-export-list.patch
 @@ -0,0 +1,142 @@
 +autofs-5.0.5 - fix rpc fail on large export list
 +
@@ -5979,10 +5979,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-rpc-large-expo
 + 			close(fd);
 + 			fd = RPC_ANYSOCK;
 + 		}
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sanity-checks-for-brackets-in-server-name.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sanity-checks-for-brackets-in-server-name.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sanity-checks-for-brackets-in-server-name.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sanity-checks-for-brackets-in-server-name.patch
 @@ -0,0 +1,64 @@
 +autofs-5.0.5 - fix sanity checks for brackets in server name
 +
@@ -6048,10 +6048,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sanity-checks-
 + 				delim++;
 + 			}
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sasl-bind-host-name-selection.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sasl-bind-host-name-selection.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sasl-bind-host-name-selection.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sasl-bind-host-name-selection.patch
 @@ -0,0 +1,43 @@
 +autofs-5.0.5 - fix sasl bind host name selection
 +
@@ -6096,10 +6096,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-sasl-bind-host
 + 	if ((tmp = strrchr(host, ':'))) {
 + 		if (*(tmp - 1) != ']') {
 + 			*tmp = '\0';
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-init-for-file-map-instance.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-init-for-file-map-instance.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-init-for-file-map-instance.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-init-for-file-map-instance.patch
 @@ -0,0 +1,39 @@
 +autofs-5.0.5 - fix stale initialization for file map instance
 +
@@ -6140,10 +6140,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-init-for
 + 	tmap.argc = 0;
 + 	tmap.argv = NULL;
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-map-read.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-map-read.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-map-read.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-map-read.patch
 @@ -0,0 +1,119 @@
 +autofs-5.0.5 - fix stale map read
 +
@@ -6264,10 +6264,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-stale-map-read
 + 		if (map->stale) {
 + 			need_update = 1;
 + 			break;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-strdup-return-value-check.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-strdup-return-value-check.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-strdup-return-value-check.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-strdup-return-value-check.patch
 @@ -0,0 +1,38 @@
 +autofs-5.0.5 - fix strdup() return value check
 +
@@ -6307,10 +6307,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-strdup-return-
 + 		return NULL;
 + 
 + 	return res;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-timeout-in-connect_nb.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-timeout-in-connect_nb.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-timeout-in-connect_nb.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-timeout-in-connect_nb.patch
 @@ -0,0 +1,44 @@
 +autofs-5.0.5 - fix timeout in connect_nb()
 +
@@ -6356,10 +6356,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-timeout-in-con
 + 	pfd[0].fd = fd;
 + 	pfd[0].events = POLLOUT;
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-wildcard-map-entry-match.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-wildcard-map-entry-match.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-wildcard-map-entry-match.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-wildcard-map-entry-match.patch
 @@ -0,0 +1,59 @@
 +autofs-5.0.5 - fix wildcard map entry match
 +
@@ -6420,10 +6420,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-fix-wildcard-map-e
 + 		ret = cache_add(mc, ms, key, mapent, age);
 + 		if (!ret) {
 + 			debug(logopt, "failed for %s", key);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-ip-address-in-debug-logging.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-ip-address-in-debug-logging.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-ip-address-in-debug-logging.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-ip-address-in-debug-logging.patch
 @@ -0,0 +1,118 @@
 +autofs-5.0.5 - include ip address in debug logging
 +
@@ -6543,10 +6543,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-ip-address
 + 
 + 	memset(&pm_info, 0, sizeof(struct conn_info));
 + 	memset(&rpc_info, 0, sizeof(struct conn_info));
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-krb5-library.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-krb5-library.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-krb5-library.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-krb5-library.patch
 @@ -0,0 +1,194 @@
 +autofs-5.0.5 - include krb5 library
 +
@@ -6742,10 +6742,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-include-krb5-libra
 +   endif
 + endif
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-documentation-for-set-log-priority-clearer.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-documentation-for-set-log-priority-clearer.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-documentation-for-set-log-priority-clearer.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-documentation-for-set-log-priority-clearer.patch
 @@ -0,0 +1,43 @@
 +autofs-5.0.5 - make documentation for set-log-priority clearer
 +
@@ -6790,10 +6790,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-documentation
 + .P
 + The \fIpath\fP argument corresponds to the automounted
 + path name as specified in the master map.
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-nfs4-default-for-redhat-replicated-selection.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-nfs4-default-for-redhat-replicated-selection.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-nfs4-default-for-redhat-replicated-selection.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-nfs4-default-for-redhat-replicated-selection.patch
 @@ -0,0 +1,25 @@
 +autofs-5.0.5 - make nfs4 default for RedHat replicated selection configuration
 +
@@ -6820,10 +6820,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-nfs4-default-
 + #
 + # APPEND_OPTIONS - append to global options instead of replace.
 + #
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-redhat-init-script-more-lsb-compliant.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-redhat-init-script-more-lsb-compliant.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-redhat-init-script-more-lsb-compliant.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-redhat-init-script-more-lsb-compliant.patch
 @@ -0,0 +1,112 @@
 +autofs-5.0.5 - make redhat init script more lsb compliant
 +
@@ -6937,10 +6937,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-make-redhat-init-s
 + 
 + 03/09/2009 autofs-5.0.5
 + -----------------------
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-mapent-becomes-negative-during-lookup.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-mapent-becomes-negative-during-lookup.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-mapent-becomes-negative-during-lookup.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-mapent-becomes-negative-during-lookup.patch
 @@ -0,0 +1,73 @@
 +autofs-5.0.5 - mapent becomes negative during lookup
 +
@@ -7015,10 +7015,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-mapent-becomes-neg
 + 		mapent_len = strlen(me->mapent);
 + 		mapent = alloca(mapent_len + 1);
 + 		strcpy(mapent, me->mapent);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-more-code-analysis-corrections.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-more-code-analysis-corrections.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-more-code-analysis-corrections.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-more-code-analysis-corrections.patch
 @@ -0,0 +1,241 @@
 +autofs-5.0.5 - more code analysis corrections (and fix a typo in an init script)
 +
@@ -7261,10 +7261,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-more-code-analysis
 + 		exit 1;
 + 		;;
 + esac
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-mount-using-address-for-rr.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-mount-using-address-for-rr.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-mount-using-address-for-rr.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-mount-using-address-for-rr.patch
 @@ -0,0 +1,126 @@
 +autofs-5.0.5 - mount using address for rr
 +
@@ -7392,10 +7392,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-mount-using-addres
 + 		if (!ret)
 + 			break;
 + 		this = this->ai_next;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-refactor-ldap-sasl-bind.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-refactor-ldap-sasl-bind.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-refactor-ldap-sasl-bind.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-refactor-ldap-sasl-bind.patch
 @@ -0,0 +1,223 @@
 +autofs-5.0.5 - refactor ldap sasl bind
 +
@@ -7620,10 +7620,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-refactor-ldap-sasl
 + #endif
 + 
 + /*
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-ERR_remove_state-openssl-call.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-ERR_remove_state-openssl-call.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-ERR_remove_state-openssl-call.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-ERR_remove_state-openssl-call.patch
 @@ -0,0 +1,44 @@
 +autofs-5.0.5 - remove ERR_remove_state() openssl call
 +
@@ -7669,10 +7669,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-ERR_remove_
 + 	autofs_sasl_unbind(ctxt);
 + #endif
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-state-machine-timed-wait.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-state-machine-timed-wait.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-state-machine-timed-wait.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-state-machine-timed-wait.patch
 @@ -0,0 +1,114 @@
 +autofs-5.0.5 - remove state machine timed wait
 +
@@ -7788,10 +7788,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-remove-state-machi
 + 			}
 + 
 + 			head = &state_queue;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-replace-gplv3-code.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-replace-gplv3-code.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-replace-gplv3-code.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-replace-gplv3-code.patch
 @@ -0,0 +1,791 @@
 +autofs-5.0.5 - replace GPLv3 code
 +
@@ -8584,10 +8584,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-replace-gplv3-code
 + 	dclist->expire = time(NULL) + min_ttl;
 + 	dclist->uri = list;
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-reset-negative-status-on-cache-prune.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-reset-negative-status-on-cache-prune.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-reset-negative-status-on-cache-prune.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-reset-negative-status-on-cache-prune.patch
 @@ -0,0 +1,38 @@
 +autofs-5.0.5 - reset negative status on cache prune
 +
@@ -8627,10 +8627,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-reset-negative-sta
 + 			me = cache_enumerate(mc, me);
 + 			continue;
 + 		}
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-special-case-cifs-escapes.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-special-case-cifs-escapes.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-special-case-cifs-escapes.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-special-case-cifs-escapes.patch
 @@ -0,0 +1,99 @@
 +autofs-5.0.5 - special case cifs escapes
 +
@@ -8731,10 +8731,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-special-case-cifs-
 + 		return 0;
 + 	}
 + }
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-use-weight-only-for-server-selection.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-use-weight-only-for-server-selection.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-use-weight-only-for-server-selection.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-use-weight-only-for-server-selection.patch
 @@ -0,0 +1,568 @@
 +autofs-5.0.5 - use weight only for server selection
 +
@@ -9304,10 +9304,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-use-weight-only-fo
 + 					p = next;
 + 					continue;
 + 				}
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-wait-for-master-source-mutex.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.5-wait-for-master-source-mutex.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-wait-for-master-source-mutex.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.5-wait-for-master-source-mutex.patch
 @@ -0,0 +1,43 @@
 +autofs-5.0.5 - wait for master source mutex
 +
@@ -9352,10 +9352,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.5-wait-for-master-so
 + 	return;
 + }
 + 
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-code-analysis-fixes-1.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.6-code-analysis-fixes-1.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-code-analysis-fixes-1.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.6-code-analysis-fixes-1.patch
 @@ -0,0 +1,95 @@
 +autofs-5.0.6 - code analysis fixes 1
 +
@@ -9452,10 +9452,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-code-analysis-fixe
 + 	}
 + #endif
 + 	if (ldap)
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-dumpmaps-not-reading-maps.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-dumpmaps-not-reading-maps.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-dumpmaps-not-reading-maps.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-dumpmaps-not-reading-maps.patch
 @@ -0,0 +1,43 @@
 +autofs-5.0.6 - fix dumpmaps not reading maps
 +
@@ -9500,10 +9500,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-dumpmaps-not-r
 + 		/* Read the map content into the cache */
 + 		if (lookup_nss_read_map(ap, NULL, now))
 + 			lookup_prune_cache(ap, now);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-improve-mount-location-error-reporting.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-improve-mount-location-error-reporting.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-improve-mount-location-error-reporting.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-improve-mount-location-error-reporting.patch
 @@ -0,0 +1,49 @@
 +autofs-5.0.6 - fix improve mount location error reporting
 +
@@ -9554,10 +9554,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-improve-mount-
 + 		error(logopt,
 + 		      "expected colon delimeter not found in location %s",
 + 		      loc);
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-paged-query-more-results-check.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-paged-query-more-results-check.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-paged-query-more-results-check.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-paged-query-more-results-check.patch
 @@ -0,0 +1,83 @@
 +autofs-5.0.6 - fix paged query more results check
 +
@@ -9642,10 +9642,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-fix-paged-query-mo
 + 	free(sp.query);
 + 
 + 	return NSS_STATUS_SUCCESS;
-Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-improve-mount-location-error-reporting.patch
+Index: b/feeds/packages/utils/autofs/patches/autofs-5.0.6-improve-mount-location-error-reporting.patch
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-improve-mount-location-error-reporting.patch
++++ b/feeds/packages/utils/autofs/patches/autofs-5.0.6-improve-mount-location-error-reporting.patch
 @@ -0,0 +1,113 @@
 +autofs-5.0.6 - improve mount location error reporting
 +
@@ -9760,10 +9760,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/autofs-5.0.6-improve-mount-loca
 + 				free(ent);
 + 				free(loc);
 + 				free(options);
-Index: trunk/feeds/packages/utils/autofs/patches/series
+Index: b/feeds/packages/utils/autofs/patches/series
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/series
++++ b/feeds/packages/utils/autofs/patches/series
 @@ -0,0 +1,83 @@
 +autofs-5.0.5-fix-included-map-read-fail-handling.patch
 +autofs-5.0.5-refactor-ldap-sasl-bind.patch
@@ -9848,10 +9848,10 @@ Index: trunk/feeds/packages/utils/autofs/patches/series
 +207-make-runtime-dep-commands-configurable
 +208-dynamic-lookup-file
 +209-use-pthread-setmask-instead-of-sigprocmask
-Index: trunk/feeds/packages/utils/autofs/patches/209-use-pthread-setmask-instead-of-sigprocmask
+Index: b/feeds/packages/utils/autofs/patches/209-use-pthread-setmask-instead-of-sigprocmask
 ===================================================================
 --- /dev/null
-+++ trunk/feeds/packages/utils/autofs/patches/209-use-pthread-setmask-instead-of-sigprocmask
++++ b/feeds/packages/utils/autofs/patches/209-use-pthread-setmask-instead-of-sigprocmask
 @@ -0,0 +1,13 @@
 +Index: autofs-5.0.5/daemon/automount.c
 +===================================================================

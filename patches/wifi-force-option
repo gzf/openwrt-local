@@ -1,7 +1,7 @@
-Index: trunk/package/base-files/files/sbin/wifi
+Index: b/package/base-files/files/sbin/wifi
 ===================================================================
---- trunk.orig/package/base-files/files/sbin/wifi
-+++ trunk/package/base-files/files/sbin/wifi
+--- a/package/base-files/files/sbin/wifi
++++ b/package/base-files/files/sbin/wifi
 @@ -101,11 +101,16 @@
  		scan_wifi
  	}
