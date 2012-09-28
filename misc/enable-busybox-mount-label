@@ -1,0 +1,39 @@
+Index: trunk/package/busybox/config/util-linux/Config.in
+===================================================================
+--- trunk.orig/package/busybox/config/util-linux/Config.in
++++ trunk/package/busybox/config/util-linux/Config.in
+@@ -544,7 +544,7 @@
+ 
+ config BUSYBOX_CONFIG_FEATURE_MOUNT_LABEL
+ 	bool "Support specifying devices by label or UUID"
+-	default n
++	default y
+ 	depends on BUSYBOX_CONFIG_MOUNT
+ 	select BUSYBOX_CONFIG_VOLUMEID
+ 	help
+@@ -764,14 +764,14 @@
+ 
+ config BUSYBOX_CONFIG_VOLUMEID
+ 	bool #No description makes it a hidden option
+-	default n
++	default y
+ 
+ menu "Filesystem/Volume identification"
+ 	depends on BUSYBOX_CONFIG_VOLUMEID
+ 
+ config BUSYBOX_CONFIG_FEATURE_VOLUMEID_EXT
+ 	bool "Ext filesystem"
+-	default n
++	default y
+ 	depends on BUSYBOX_CONFIG_VOLUMEID
+ 	help
+ 	  TODO
+@@ -855,7 +855,7 @@
+ 
+ config BUSYBOX_CONFIG_FEATURE_VOLUMEID_LINUXSWAP
+ 	bool "linux swap filesystem"
+-	default n
++	default y
+ 	depends on BUSYBOX_CONFIG_VOLUMEID
+ 	help
+ 	  TODO

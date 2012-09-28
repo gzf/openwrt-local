@@ -48,7 +48,7 @@ Index: trunk/feeds/packages/utils/vim/Makefile
 +		--enable-multibyte \
 +	)
 +	$(MAKE) -C $(PKG_BUILD_DIR) clean
-+	$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
++	+$(MAKE) $(PKG_JOBS) -C $(PKG_BUILD_DIR) \
 +		DESTDIR="$(PKG_INSTALL_DIR)" all
 +	$(CP) $(PKG_BUILD_DIR)/src/$(PKG_NAME) $(PKG_BUILD_DIR)/vim_small
 +endef
@@ -91,5 +91,6 @@ Index: trunk/feeds/packages/utils/vim/files/vimrc.small
 ===================================================================
 --- /dev/null
 +++ trunk/feeds/packages/utils/vim/files/vimrc.small
-@@ -0,0 +1 @@
+@@ -0,0 +1,2 @@
++set nocompatible
 +set encoding=utf-8

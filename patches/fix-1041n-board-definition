@@ -1,0 +1,27 @@
+Index: trunk/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
+===================================================================
+--- trunk.orig/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
++++ trunk/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
+@@ -82,6 +82,14 @@
+ 	.rxclk_delay_sel = AR8327_CLK_DELAY_SEL2,
+ };
+ 
++static struct ar8327_led_cfg ar8327_led_cfg = {
++	.led_ctrl0 = 0xc737c737,
++	.led_ctrl1 = 0x00000000,
++	.led_ctrl2 = 0x00000000,
++	.led_ctrl3 = 0x0030c300,
++	.open_drain = false,
++};
++
+ static struct ar8327_platform_data db120_ar8327_data = {
+ 	.pad0_cfg = &db120_ar8327_pad0_cfg,
+ 	.cpuport_cfg = {
+@@ -91,6 +99,7 @@
+ 		.txpause = 1,
+ 		.rxpause = 1,
+ 	}
++	.led_cfg = &ar8327_led_cfg,
+ };
+ 
+ static struct mdio_board_info db120_mdio0_info[] = {

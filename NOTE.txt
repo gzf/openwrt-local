@@ -1,1 +1,38 @@
 Working Revision: svn://svn.openwrt.org/openwrt/trunk/@33366
+
+config:
+    - firewall
+
+    * kmod-usb2
+    * kmod-usb-ohci
+	* kmod-ledtrig-usbdev
+
+    y kmod-usb-serial-option
+    y comgt
+    y usb-modeswitch
+    y usb-modeswitch-data
+
+    m block-mount
+    m autofs5
+    m autofs5-mount-ext2
+    m ez-ipupdate-3322
+    m rsync
+    m vim-small
+    m git
+    m openvpn
+    m wol
+    m wget
+    m lftp
+    m sudo
+    m kmod-led-trigger-heartbeat
+    m kmod-scsi-core 
+    m kmod-usb-printer
+    m kmod-usb-storage
+    m kmod-fs-ext4
+    m kmod-fs-vfat
+    m kmod-fs-fuse
+    m kmod-fs-xfs
+    m kmod-nls-cp437
+    m kmod-nls-utf8
+    m kmod-ipv6
+    m kmod-gpio-dev

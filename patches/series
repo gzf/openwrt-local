@@ -1,7 +1,8 @@
-1041n-v2-usb-registeration
+fix-1041n-board-definition
+1041n-usb-modification
+mw4530r-support
+wifi-force-option
 pkg-autofs5
 pkg-incron
 pkg-ez-ipupdate-3322
-wifi-force-option
 pkg-vim-small
-mw4530r-support
