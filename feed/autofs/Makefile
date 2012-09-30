@@ -68,8 +68,10 @@ define Package/autofs5/conffiles
 endef
 
 CONFIGURE_ARGS += --with-E2FSCK=/usr/sbin/e2fsck \
-				--with-E3FSCK=/usr/sbin/e2fsck \
-				--with-E4FSCK=/usr/sbin/e2fsck
+			--with-E3FSCK=/usr/sbin/e2fsck \
+			--with-E4FSCK=/usr/sbin/e2fsck \
+			--with-openldap=no \
+			--with-sasl=no
 
 define Package/autofs5/install
 	$(INSTALL_DIR) $(1)/usr/sbin

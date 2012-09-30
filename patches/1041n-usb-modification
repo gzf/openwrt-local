@@ -28,7 +28,7 @@ Index: b/target/linux/ar71xx/generic/profiles/tp-link.mk
  define Profile/TLWR1041
  	NAME:=TP-LINK TL-WR1041N
 -	PACKAGES:=
-+	PACKAGES:=kmod-usb-ohci kmod-usb2 kmod-ledtrig-usbdev
++	PACKAGES:=kmod-usb2 kmod-ledtrig-usbdev
  endef
  
  define Profile/TLWR1041/Description
