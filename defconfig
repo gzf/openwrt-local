@@ -1,37 +1,80 @@
 CONFIG_TARGET_ar71xx=y
 CONFIG_TARGET_ar71xx_generic=y
 
+# build-in 3G modem support
 CONFIG_PACKAGE_kmod-usb-serial=y
 CONFIG_PACKAGE_kmod-usb-serial-option=y
 CONFIG_PACKAGE_comgt=y
 CONFIG_PACKAGE_usb-modeswitch=y
 CONFIG_PACKAGE_usb-modeswitch-data=y
 
+# build firewall as a package
 CONFIG_PACKAGE_firewall=m
+
+# core utils
+CONFIG_PACKAGE_ip=m
+CONFIG_PACKAGE_tc=m
+CONFIG_PACKAGE_ip6tables=m
+CONFIG_PACKAGE_ebtables=m
+CONFIG_PACKAGE_ebtables-utils=m
+CONFIG_PACKAGE_arptables=m
+CONFIG_PACKAGE_vim-small=m
+
+# VPN
+CONFIG_PACKAGE_openvpn=m
+CONFIG_PACKAGE_n2n=m
+CONFIG_PACKAGE_ppp-mod-pptp=m
+CONFIG_PACKAGE_pptpd=m
+
+# storages
 CONFIG_PACKAGE_block-mount=m
 CONFIG_PACKAGE_autofs5=m
 CONFIG_PACKAGE_autofs5-mount-ext2=m
-CONFIG_PACKAGE_ez-ipupdate-3322=m
-CONFIG_PACKAGE_openldap-server=m
-CONFIG_PACKAGE_openldap-utils=m
-CONFIG_PACKAGE_rsync=m
-CONFIG_PACKAGE_vim-small=m
-CONFIG_PACKAGE_git=m
-CONFIG_PACKAGE_openvpn=m
-CONFIG_PACKAGE_wol=m
-CONFIG_PACKAGE_wget=m
-CONFIG_PACKAGE_lftp=m
-CONFIG_PACKAGE_sudo=m
-CONFIG_PACKAGE_ntfs-3g=m
-CONFIG_PACKAGE_NTFS-3G_USE_LIBFUSE=y
-CONFIG_PACKAGE_kmod-ledtrig-heartbeat=m
 CONFIG_PACKAGE_kmod-scsi-core=m
-CONFIG_PACKAGE_kmod-usb-ohci=m
-CONFIG_PACKAGE_kmod-usb-printer=m
 CONFIG_PACKAGE_kmod-usb-storage=m
 CONFIG_PACKAGE_kmod-fs-ext4=m
 CONFIG_PACKAGE_kmod-fs-vfat=m
 CONFIG_PACKAGE_kmod-fs-xfs=m
 CONFIG_PACKAGE_kmod-nls-cp437=m
 CONFIG_PACKAGE_kmod-nls-utf8=m
-CONFIG_PACKAGE_kmod-ipv6=m
+
+# QoS
+CONFIG_PACKAGE_qos-scripts=m
+CONFIG_PACKAGE_kmod-sched=m
+CONFIG_PACKAGE_kmod-sched-esfq=m
+
+# tunnel
+CONFIG_PACKAGE_kmod-sit=m
+CONFIG_PACKAGE_kmod-ipip=m
+CONFIG_PACKAGE_kmod-ip6-tunnel=m
+
+# printer
+CONFIG_PACKAGE_kmod-usb-printer=m
+CONFIG_PACKAGE_cups=m
+CONFIG_PACKAGE_cups-bjnp=m
+
+# misc
+CONFIG_PACKAGE_ez-ipupdate-3322=m
+CONFIG_PACKAGE_openldap-server=m
+CONFIG_PACKAGE_openldap-utils=m
+CONFIG_PACKAGE_samba36-server=m
+CONFIG_PACKAGE_samba36-client=m
+CONFIG_PACKAGE_multiwan=m
+CONFIG_PACKAGE_tcpdump=m
+CONFIG_PACKAGE_wpa-cli=m
+CONFIG_PACKAGE_iperf-mt=m
+CONFIG_PACKAGE_netcat=m
+CONFIG_PACKAGE_rsync=m
+CONFIG_PACKAGE_git=m
+CONFIG_PACKAGE_wol=m
+CONFIG_PACKAGE_wget=m
+CONFIG_PACKAGE_lftp=m
+CONFIG_PACKAGE_sudo=m
+CONFIG_PACKAGE_ntfs-3g=m
+CONFIG_PACKAGE_NTFS-3G_USE_LIBFUSE=y
+CONFIG_PACKAGE_l7-protocols=m
+CONFIG_PACKAGE_l7-protocols-testing=m
+CONFIG_PACKAGE_kmod-ledtrig-heartbeat=m
+CONFIG_PACKAGE_kmod-usb-ohci=m
+CONFIG_PACKAGE_kmod-loop=m
+CONFIG_PACKAGE_kmod-macvlan=m
