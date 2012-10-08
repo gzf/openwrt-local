@@ -19,6 +19,9 @@ CONFIG_PACKAGE_ebtables=m
 CONFIG_PACKAGE_ebtables-utils=m
 CONFIG_PACKAGE_arptables=m
 CONFIG_PACKAGE_vim-small=m
+CONFIG_PACKAGE_iptables-mod-nat-extra=m
+CONFIG_PACKAGE_kmod-ipt-nathelper-extra=m
+CONFIG_PACKAGE_kmod-ipt-nathelper-rtsp=m
 
 # VPN
 CONFIG_PACKAGE_openvpn=m
