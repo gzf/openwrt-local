@@ -1,8 +1,9 @@
+pkg-vim-small
 feeds-conf
-enable-fixed-vermagic
+add-option-to-build-all-kmods
+add-option-to-specify-vermagic
 fix-1041n-board-definition
 1041n-usb-modification
 mw4530r-support
 wifi-force-option
-pkg-vim-small
 ticket-11700-cyrus-sasl
