@@ -1,5 +1,4 @@
 pkg-vim-small
-feeds-conf
 add-option-to-build-all-kmods
 add-option-to-specify-vermagic
 fix-1041n-board-definition
