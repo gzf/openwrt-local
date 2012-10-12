@@ -28,3 +28,9 @@ CONFIG_PACKAGE_uhttpd-mod-tls_cyassl=y
 # Disable some kmods
 # CONFIG_PACKAGE_kmod-ebtables is not set
 # CONFIG_PACKAGE_kmod-libertas-sd is not set
+
+# local feeds
+CONFIG_PACKAGE_vim-small=m
+CONFIG_PACKAGE_ez-ipupdate-3322=m
+CONFIG_PACKAGE_autofs5=m
+CONFIG_PACKAGE_autofs5-mount-ext2=m
