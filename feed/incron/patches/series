@@ -1,3 +1,0 @@
-remove-argp
-use-access-instead-of-euidaccess
-compile-against-uclibc++
