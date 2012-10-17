@@ -3,6 +3,9 @@ CONFIG_TARGET_ar71xx_generic=y
 # build firmware for MW4530R by default
 CONFIG_TARGET_ar71xx_generic_MCMW4530R=y
 
+#CONFIG_TARGET_brcm63xx=y
+#CONFIG_TARGET_brcm63xx_Broadcom=y
+
 # build all kmod packages
 CONFIG_ALL_KMODS=y
 # specify vermagic if necessary
