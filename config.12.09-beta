@@ -25,6 +25,10 @@ CONFIG_PACKAGE_kmod-usb-ohci=y
 CONFIG_PACKAGE_luci=y
 CONFIG_PACKAGE_luci-proto-3g=y
 CONFIG_PACKAGE_luci-i18n-chinese=y
+# enable https
+CONFIG_PACKAGE_luci-ssl=y
+CONFIG_PACKAGE_uhttpd-mod-tls=y
+CONFIG_PACKAGE_uhttpd-mod-tls_cyassl=y
 
 # Disable some kmods
 # CONFIG_PACKAGE_kmod-ebtables is not set
