@@ -5,4 +5,5 @@ fix-1041n-board-definition
 1041n-usb-modification
 mw4530r-support
 wifi-force-option
+set-EDITOR-if-vim-is-installed
 ticket-11700-cyrus-sasl
