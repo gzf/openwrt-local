@@ -1,0 +1,50 @@
+CONFIG_TARGET_brcm63xx=y
+CONFIG_TARGET_brcm63xx_Broadcom=y
+#CONFIG_TARGET_ar71xx=y
+#CONFIG_TARGET_ar71xx_generic=y
+
+# build all kmod packages
+CONFIG_ALL_KMODS=y
+# specify vermagic if necessary
+CONFIG_KERNEL_VERMAGIC=""
+
+# CONFIG_TARGET_ROOTFS_JFFS2 is not set
+
+# ccache
+CONFIG_DEVEL=y
+CONFIG_CCACHE=y
+
+# busybox
+CONFIG_BUSYBOX_CONFIG_UNICODE_SUPPORT=y
+CONFIG_BUSYBOX_CONFIG_LAST_SUPPORTED_WCHAR=0
+CONFIG_BUSYBOX_CONFIG_UNICODE_COMBINING_WCHARS=y
+CONFIG_BUSYBOX_CONFIG_UNICODE_WIDE_WCHARS=y
+# remove the leading '#' to exclude the vi applet of busybox
+## CONFIG_BUSYBOX_CONFIG_VI is not set
+
+# remove the leading '#' to exclude firewall
+## CONFIG_PACKAGE_firewall is not set
+
+# 3G modem support
+CONFIG_PACKAGE_kmod-usb-serial=y
+CONFIG_PACKAGE_kmod-usb-serial-option=y
+CONFIG_PACKAGE_comgt=y
+CONFIG_PACKAGE_usb-modeswitch=y
+CONFIG_PACKAGE_usb-modeswitch-data=y
+CONFIG_PACKAGE_vim-small=y
+
+# uncomment the following lines to include luci 
+# and https support
+#CONFIG_PACKAGE_luci=y
+#CONFIG_PACKAGE_luci-proto-3g=y
+#CONFIG_PACKAGE_luci-ssl=y
+#CONFIG_PACKAGE_uhttpd-mod-tls=y
+#CONFIG_PACKAGE_uhttpd-mod-tls_cyassl=y
+
+# zaptel fail to compile currently
+# it is an external kmod, and has no impact on vermagic
+# CONFIG_PACKAGE_kmod-zaptel14 is not set
+# CONFIG_PACKAGE_kmod-zaptel14-dummy is not set
+# CONFIG_PACKAGE_kmod-zaptel14-wctdm is not set
+# CONFIG_PACKAGE_kmod-zaptel14-wcusb is not set
+
