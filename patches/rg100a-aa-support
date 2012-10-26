@@ -1,0 +1,180 @@
+Index: b/target/linux/brcm63xx/image/Makefile
+===================================================================
+--- a/target/linux/brcm63xx/image/Makefile
++++ b/target/linux/brcm63xx/image/Makefile
+@@ -79,6 +79,16 @@
+ 		--image-offset $(4) --info1 "-$(call Image/LimitName16,$(5))" --info2 $(1)
+ endef
+ 
++define Image/Build/RG100AAA
++	# Generate the tagged image
++	$(STAGING_DIR_HOST)/bin/imagetag -i $(KDIR)/vmlinux.lzma.cfe -f $(KDIR)/root.$(1) \
++		--output $(BIN_DIR)/openwrt-$(5)-$(1)-cfe.bin \
++		--boardid $(2) --chipid $(3) --entry $(LOADADDR) \
++		--load-addr $(LOADADDR) --block-size 0x20000 \
++		--image-offset $(4) --info1 "+$(call Image/LimitName16,$(5))" --info2 $(1)
++endef
++
++
+ define Image/Build/RedBoot
+ 	cp $(KDIR)/vmlinux.elf $(BIN_DIR)/openwrt-$(1)-vmlinux.elf
+ 	gzip -9 -c $(KDIR)/vmlinux > $(KDIR)/vmlinux.bin.gz
+@@ -242,6 +252,7 @@
+ 
+ 	# RG100A,DB120 etc.
+ 	$(call Image/Build/RG100A,$(1),96358VW2,6358,0x20000,RG100A_DB120)
++	$(call Image/Build/RG100AAA,$(1),96358VW2,6358,0x20000,RG100A-AA)
+ 
+ 	# Telsey CPVA642-type (e.g. CPA-ZNTE60T)
+ 	$(call Image/Build/CFE,$(1),CPVA642,6358,CPA-ZNTE60T,,--signature "Telsey Tlc",--signature2 "99.99.999",--second-image-flag "0")
+Index: b/target/linux/brcm63xx/base-files/etc/uci-defaults/network
+===================================================================
+--- a/target/linux/brcm63xx/base-files/etc/uci-defaults/network
++++ b/target/linux/brcm63xx/base-files/etc/uci-defaults/network
+@@ -43,6 +43,17 @@
+ 	ucidef_add_switch_vlan "eth1" "1" "0 1 2 3 4 5t"
+ 	;;
+ 
++RG100A-AA)
++	ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
++    uci batch <<EOF
++set network.eth0=switch
++set network.eth0.reset='1'
++set network.eth0.enable_vlan='1'
++EOF
++	ucidef_add_switch_vlan "eth0" "1" "0 1 2 5t"
++	ucidef_add_switch_vlan "eth0" "2" "3 5t"
++	;;
++
+ *)
+ 	ucidef_set_interfaces_lan_wan "eth1" "eth0"
+ 	;;
+Index: b/target/linux/brcm63xx/base-files/lib/brcm63xx.sh
+===================================================================
+--- a/target/linux/brcm63xx/base-files/lib/brcm63xx.sh
++++ b/target/linux/brcm63xx/base-files/lib/brcm63xx.sh
+@@ -86,6 +86,11 @@
+ 		brcm63xx_has_reset_button="true"
+ 		ifname=eth0
+ 		;;
++	RG100A-AA)
++		status_led="rg100a:green:power"
++		brcm63xx_has_reset_button="true"
++		ifname=eth1
++		;;
+ 	*)
+ 		;;
+ 	esac
+Index: b/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
+===================================================================
+--- a/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
++++ b/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
+@@ -1,8 +1,8 @@
+ #!/bin/sh
+ 
+-. /lib/brcm63xx.sh
+-
+ enable_reset_button() {
++    . /lib/brcm63xx.sh
++
+ 	if [ "$brcm63xx_has_reset_button" = "true" ]; then
+ 		insmod input-core
+ 		insmod input-polldev
+Index: b/target/linux/brcm63xx/patches-3.3/560-board_RG100A-AA.patch
+===================================================================
+--- /dev/null
++++ b/target/linux/brcm63xx/patches-3.3/560-board_RG100A-AA.patch
+@@ -0,0 +1,93 @@
++Index: b/arch/mips/bcm63xx/boards/board_bcm963xx.c
++===================================================================
++--- a/arch/mips/bcm63xx/boards/board_bcm963xx.c
+++++ b/arch/mips/bcm63xx/boards/board_bcm963xx.c
++@@ -2697,6 +2697,80 @@
++ 		},
++ 	},
++ };
+++
+++static struct board_info __initdata board_RG100A_AA = {
+++	.name				= "RG100A-AA",
+++	.expected_cpu_id		= 0x6358,
+++
+++	.has_uart0			= 1,
+++	.has_enet1			= 1,
+++	.has_pci			= 1,
+++
+++	.enet1 = {
+++		.force_speed_100	= 1,
+++		.force_duplex_full	= 1,
+++	},
+++
+++	.has_ohci0 = 1,
+++	.has_pccard = 1,
+++	.has_ehci0 = 1,
+++
+++	.leds = {
+++		{
+++			.name		= "rg100a:green:adsl",
+++			.gpio		= 22,
+++			.active_low	= 1,
+++		},
+++		{
+++			.name		= "rg100a:green:inet",
+++			.gpio		= 8,
+++			.active_low	= 1,
+++		},
+++		{
+++			.name		= "rg100a:green:wps",
+++			.gpio		= 24,
+++			.active_low	= 1,
+++		},
+++		{
+++			.name		= "rg100a:green:usb",
+++			.gpio		= 0,
+++			.active_low	= 1,
+++		},
+++		{
+++			.name		= "rg100a:green:power",
+++			.gpio		= 4,
+++			.active_low	= 0,
+++			.default_trigger = "default-on",
+++		},
+++	},
+++	.buttons = {
+++		{
+++			.desc	= "reset",
+++			.gpio	= 36,
+++			.active_low = 1,
+++			.type	= EV_KEY,
+++			.code	= KEY_RESTART,
+++			.debounce_interval = BCM963XX_KEYS_DEBOUNCE_INTERVAL,
+++		},
+++		{
+++			.desc	= "wps",
+++			.gpio	= 37,
+++			.active_low = 1,
+++			.type	= EV_KEY,
+++			.code	= KEY_WPS_BUTTON,
+++			.debounce_interval = BCM963XX_KEYS_DEBOUNCE_INTERVAL,
+++		},
+++		{
+++			.desc	= "wlan",
+++			.gpio	= 34,
+++			.active_low = 1,
+++			.type	= EV_KEY,
+++			.code	= KEY_WLAN,
+++			.debounce_interval = BCM963XX_KEYS_DEBOUNCE_INTERVAL,
+++		},
+++	},
+++};
+++
++ #endif
++ 
++ #ifdef CONFIG_BCM63XX_CPU_6362
++@@ -2990,6 +3064,7 @@
++ 	&board_HW553,
++ 	&board_spw303v,
++ 	&board_DVAG3810BN,
+++	&board_RG100A_AA,
++ #endif
++ 
++ #ifdef CONFIG_BCM63XX_CPU_6362

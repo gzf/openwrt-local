@@ -1,0 +1,28 @@
+Index: b/package/button-hotplug/src/button-hotplug.c
+===================================================================
+--- a/package/button-hotplug/src/button-hotplug.c
++++ b/package/button-hotplug/src/button-hotplug.c
+@@ -87,6 +87,9 @@
+ #ifdef KEY_WPS_BUTTON
+ 	BH_MAP(KEY_WPS_BUTTON,	"wps"),
+ #endif /* KEY_WPS_BUTTON */
++#ifdef KEY_WLAN
++	BH_MAP(KEY_WLAN,	"wlan"),
++#endif /* KEY_WLAN */
+ };
+ 
+ /* -------------------------------------------------------------------------*/
+Index: b/package/gpio-button-hotplug/src/gpio-button-hotplug.c
+===================================================================
+--- a/package/gpio-button-hotplug/src/gpio-button-hotplug.c
++++ b/package/gpio-button-hotplug/src/gpio-button-hotplug.c
+@@ -93,6 +93,9 @@
+ #ifdef KEY_WPS_BUTTON
+ 	BH_MAP(KEY_WPS_BUTTON,	"wps"),
+ #endif /* KEY_WPS_BUTTON */
++#ifdef KEY_WLAN
++	BH_MAP(KEY_WLAN,	"wlan"),
++#endif /* KEY_WLAN */
+ };
+ 
+ /* -------------------------------------------------------------------------*/

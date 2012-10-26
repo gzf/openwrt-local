@@ -7,3 +7,6 @@ mw4530r-support
 wifi-force-option
 set-EDITOR-if-vim-is-installed
 ticket-11700-cyrus-sasl
+rg100a-aa-support
+add-KEY_WLAN-button-mapping
+b43-led-improvement
