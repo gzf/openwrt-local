@@ -1,0 +1,30 @@
+Index: b/target/linux/brcm63xx/Makefile
+===================================================================
+--- a/target/linux/brcm63xx/Makefile
++++ b/target/linux/brcm63xx/Makefile
+@@ -15,8 +15,7 @@
+ 
+ include $(INCLUDE_DIR)/target.mk
+ 
+-DEFAULT_PACKAGES += kmod-switch kmod-input-gpio-keys-polled \
+-	kmod-button-hotplug
++DEFAULT_PACKAGES += kmod-switch kmod-gpio-button-hotplug
+ 
+ define Target/Description
+ 	Build firmware images for Broadcom based xDSL/routers
+Index: b/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
+===================================================================
+--- a/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
++++ b/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
+@@ -4,10 +4,7 @@
+     . /lib/brcm63xx.sh
+ 
+ 	if [ "$brcm63xx_has_reset_button" = "true" ]; then
+-		insmod input-core
+-		insmod input-polldev
+-		insmod gpio_buttons
+-		insmod button-hotplug
++		insmod gpio-button-hotplug
+ 	fi
+ }
+ 

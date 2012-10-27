@@ -10,4 +10,5 @@ ticket-11700-cyrus-sasl
 rg100a-aa-support
 fix-wrong-time-to-source-script
 change-button-hotplug-behavior-and-name-mapping
+brcm63xx-adopts-kmod-gpio-button-hotplug
 b43-led-improvement
