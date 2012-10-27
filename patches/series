@@ -9,5 +9,5 @@ set-EDITOR-if-vim-is-installed
 ticket-11700-cyrus-sasl
 rg100a-aa-support
 fix-wrong-time-to-source-script
-add-KEY_WLAN-button-mapping
+change-button-hotplug-behavior-and-name-mapping
 b43-led-improvement

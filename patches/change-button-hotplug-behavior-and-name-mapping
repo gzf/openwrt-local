@@ -1,0 +1,82 @@
+Index: b/package/gpio-button-hotplug/src/gpio-button-hotplug.c
+===================================================================
+--- a/package/gpio-button-hotplug/src/gpio-button-hotplug.c
++++ b/package/gpio-button-hotplug/src/gpio-button-hotplug.c
+@@ -45,6 +45,7 @@
+ 
+ struct bh_priv {
+ 	unsigned long		seen;
++	unsigned long		press_jiffies;
+ };
+ 
+ struct bh_event {
+@@ -225,28 +226,34 @@
+ 	return -1;
+ }
+ static void button_hotplug_event(struct gpio_keys_button_data *data,
+-			   unsigned int type, unsigned int code, int value)
++           struct gpio_keys_button* button, int value)
+ {
+ 	struct bh_priv *priv = &data->bh;
+-	unsigned long seen = jiffies;
+-	int btn;
++	unsigned long seen = (jiffies - priv->press_jiffies) / HZ;
++	int index;
++    const char *btn_name;
+ 
+-	BH_DBG("event type=%u, code=%u, value=%d\n", type, code, value);
++	BH_DBG("event type=%u, code=%u, value=%d\n", button->type, button->code, value);
+ 
+-	if (type != EV_KEY)
++	if (button->type && button->type != EV_KEY)
+ 		return;
++    
++    if (value && priv->seen == seen)
++        return;
++
++    if (button->desc != NULL)
++        btn_name = button->desc;
++    else {
++        index = button_get_index(button->code);
++        btn_name = index >= 0 ? button_map[index].name : "noname";
++    }
+ 
+-	btn = button_get_index(code);
+-	if (btn < 0)
+-		return;
+-
+-	button_hotplug_create_event(button_map[btn].name,
+-			(seen - priv->seen) / HZ, value);
+-	priv->seen = seen;
++	button_hotplug_create_event(btn_name, seen, value);
++    priv->seen = seen;
+ }
+ #else
+ static void button_hotplug_event(struct gpio_keys_button_data *data,
+-			   unsigned int type, unsigned int code, int value)
++			   struct gpio_keys_button* button, int value)
+ {
+ }
+ #endif	/* CONFIG_HOTPLUG */
+@@ -271,12 +278,18 @@
+ 
+ 	state = !!(state ^ button->active_low);
+ 	if (state != bdata->last_state) {
+-		unsigned int type = button->type ?: EV_KEY;
++        if (state) { /* pressed */
++            bdata->bh.press_jiffies = jiffies;
++            bdata->bh.seen = 0xffffffff;
++        }
++        else /* released */
++            bdata->count = 0;
+ 
+-		button_hotplug_event(bdata, type, button->code, state);
+-		bdata->count = 0;
++		button_hotplug_event(bdata, button, state);
+ 		bdata->last_state = state;
+ 	}
++    else if (state) /* if button is held, create event for each second */
++		button_hotplug_event(bdata, button, state);
+ }
+ 
+ static void gpio_keys_polled_queue_work(struct gpio_keys_polled_dev *bdev)
