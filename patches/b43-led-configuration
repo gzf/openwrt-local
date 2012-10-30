@@ -1,0 +1,420 @@
+Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
+===================================================================
+--- /dev/null
++++ b/package/mac80211/patches/840-b43-led-configuration-param.patch
+@@ -0,0 +1,415 @@
++Index: b/drivers/net/wireless/b43/leds.c
++===================================================================
++--- a/drivers/net/wireless/b43/leds.c
+++++ b/drivers/net/wireless/b43/leds.c
++@@ -30,6 +30,9 @@
++ #include "leds.h"
++ #include "rfkill.h"
++ 
+++static char modparam_leds[40];
+++module_param_string(leds, modparam_leds, 40, 0444);
+++MODULE_PARM_DESC(leds, "leds configuration: <0|1|2|3>:<tx|rx|radio|assoc|tpt>[:<0|1>],... ");
++ 
++ static void b43_led_turn_on(struct b43_wldev *dev, u8 led_index,
++ 			    bool activelow)
++@@ -87,6 +90,7 @@
++ 
++ static void b43_leds_work(struct work_struct *work)
++ {
+++    int i;
++ 	struct b43_leds *leds = container_of(work, struct b43_leds, work);
++ 	struct b43_wl *wl = container_of(leds, struct b43_wl, leds);
++ 	struct b43_wldev *dev;
++@@ -96,10 +100,8 @@
++ 	if (unlikely(!dev || b43_status(dev) < B43_STAT_STARTED))
++ 		goto out_unlock;
++ 
++-	b43_led_update(dev, &wl->leds.led_tx);
++-	b43_led_update(dev, &wl->leds.led_rx);
++-	b43_led_update(dev, &wl->leds.led_radio);
++-	b43_led_update(dev, &wl->leds.led_assoc);
+++    for (i=0; i<leds->led_count; i++)
+++        b43_led_update(dev, &wl->leds.leds[i]);
++ 
++ out_unlock:
++ 	mutex_unlock(&wl->mutex);
++@@ -118,20 +120,24 @@
++ 	}
++ }
++ 
++-static int b43_register_led(struct b43_wldev *dev, struct b43_led *led,
++-			    const char *name, const char *default_trigger,
+++static int b43_register_led(struct b43_wldev *dev, const char *default_trigger,
++ 			    u8 led_index, bool activelow)
++ {
++ 	int err;
+++    struct b43_leds *leds = &dev->wl->leds; 
+++    struct b43_led *led = NULL;
++ 
++-	if (led->wl)
++-		return -EEXIST;
+++    if (leds->led_count >= B43_MAX_NR_LEDS)
+++        return -EOVERFLOW;
++ 	if (!default_trigger)
++ 		return -EINVAL;
+++    led = &leds->leds[leds->led_count];
+++
++ 	led->wl = dev->wl;
++ 	led->index = led_index;
++ 	led->activelow = activelow;
++-	strncpy(led->name, name, sizeof(led->name));
+++    snprintf(led->name, sizeof(led->name),
+++			 "b43-%s:%d", wiphy_name(dev->wl->hw->wiphy), led_index);
++ 	atomic_set(&led->state, 0);
++ 
++ 	led->led_dev.name = led->name;
++@@ -140,11 +146,12 @@
++ 
++ 	err = led_classdev_register(dev->dev->dev, &led->led_dev);
++ 	if (err) {
++-		b43warn(dev->wl, "LEDs: Failed to register %s\n", name);
+++		b43warn(dev->wl, "LEDs: Failed to register %s\n", led->name);
++ 		led->wl = NULL;
++ 		return err;
++ 	}
++ 
+++    leds->led_count++;
++ 	return 0;
++ }
++ 
++@@ -156,173 +163,146 @@
++ 	led->wl = NULL;
++ }
++ 
++-static void b43_map_led(struct b43_wldev *dev,
++-			u8 led_index,
++-			enum b43_led_behaviour behaviour,
++-			bool activelow)
+++static const struct ieee80211_tpt_blink b43_tpt_blink[] = {
+++    { .throughput = 0 * 1024, .blink_time = 334 },
+++    { .throughput = 1 * 1024, .blink_time = 260 },
+++    { .throughput = 5 * 1024, .blink_time = 220 },
+++    { .throughput = 10 * 1024, .blink_time = 190 },
+++    { .throughput = 20 * 1024, .blink_time = 170 },
+++    { .throughput = 50 * 1024, .blink_time = 150 },
+++    { .throughput = 70 * 1024, .blink_time = 130 },
+++    { .throughput = 100 * 1024, .blink_time = 110 },
+++    { .throughput = 200 * 1024, .blink_time = 80 },
+++    { .throughput = 300 * 1024, .blink_time = 50 },
+++};
+++
+++static void b43_map_led(struct b43_wldev *dev, u8 gpio, u8 sprom_conf)
++ {
++ 	struct ieee80211_hw *hw = dev->wl->hw;
++-	char name[B43_LED_MAX_NAME_LEN + 1];
+++    enum b43_led_behaviour behaviour;
+++    bool activelow;
+++        
+++    if (sprom_conf == 0xFF)
+++        return; /* not configured, ignore */
+++
+++    behaviour = sprom_conf & B43_LED_BEHAVIOUR;
+++    activelow = !!(sprom_conf & B43_LED_ACTIVELOW);
++ 
++ 	/* Map the b43 specific LED behaviour value to the
++ 	 * generic LED triggers. */
++ 	switch (behaviour) {
++ 	case B43_LED_INACTIVE:
++ 	case B43_LED_OFF:
++-	case B43_LED_ON:
++ 		break;
+++	case B43_LED_ON:
++ 	case B43_LED_ACTIVITY:
++ 	case B43_LED_TRANSFER:
++ 	case B43_LED_APTRANSFER:
++-		snprintf(name, sizeof(name),
++-			 "b43-%s::tx", wiphy_name(hw->wiphy));
++-		b43_register_led(dev, &dev->wl->leds.led_tx, name,
++-				 ieee80211_get_tx_led_name(hw),
++-				 led_index, activelow);
++-		snprintf(name, sizeof(name),
++-			 "b43-%s::rx", wiphy_name(hw->wiphy));
++-		b43_register_led(dev, &dev->wl->leds.led_rx, name,
++-				 ieee80211_get_rx_led_name(hw),
++-				 led_index, activelow);
+++		b43_register_led(dev,
+++                         ieee80211_create_tpt_led_trigger(hw, IEEE80211_TPT_LEDTRIG_FL_RADIO, 
+++                             b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink)),
+++                         gpio, activelow);
++ 		break;
++ 	case B43_LED_RADIO_ALL:
++ 	case B43_LED_RADIO_A:
++ 	case B43_LED_RADIO_B:
++ 	case B43_LED_MODE_BG:
++-		snprintf(name, sizeof(name),
++-			 "b43-%s::radio", wiphy_name(hw->wiphy));
++-		b43_register_led(dev, &dev->wl->leds.led_radio, name,
+++		b43_register_led(dev,
++ 				 ieee80211_get_radio_led_name(hw),
++-				 led_index, activelow);
+++				 gpio, activelow);
++ 		break;
++ 	case B43_LED_WEIRD:
++ 	case B43_LED_ASSOC:
++-		snprintf(name, sizeof(name),
++-			 "b43-%s::assoc", wiphy_name(hw->wiphy));
++-		b43_register_led(dev, &dev->wl->leds.led_assoc, name,
+++		b43_register_led(dev,
++ 				 ieee80211_get_assoc_led_name(hw),
++-				 led_index, activelow);
+++				 gpio, activelow);
++ 		break;
++ 	default:
++ 		b43warn(dev->wl, "LEDs: Unknown behaviour 0x%02X\n",
++-			behaviour);
+++                behaviour);
++ 		break;
++ 	}
++ }
++ 
++-static void b43_led_get_sprominfo(struct b43_wldev *dev,
++-				  unsigned int led_index,
++-				  enum b43_led_behaviour *behaviour,
++-				  bool *activelow)
++-{
++-	u8 sprom[4];
++-
++-	sprom[0] = dev->dev->bus_sprom->gpio0;
++-	sprom[1] = dev->dev->bus_sprom->gpio1;
++-	sprom[2] = dev->dev->bus_sprom->gpio2;
++-	sprom[3] = dev->dev->bus_sprom->gpio3;
++-
++-	if (sprom[led_index] == 0xFF) {
++-		/* There is no LED information in the SPROM
++-		 * for this LED. Hardcode it here. */
++-		*activelow = false;
++-		switch (led_index) {
++-		case 0:
++-			*behaviour = B43_LED_ACTIVITY;
++-			*activelow = true;
++-			if (dev->dev->board_vendor == PCI_VENDOR_ID_COMPAQ)
++-				*behaviour = B43_LED_RADIO_ALL;
++-			break;
++-		case 1:
++-			*behaviour = B43_LED_RADIO_B;
++-			if (dev->dev->board_vendor == PCI_VENDOR_ID_ASUSTEK)
++-				*behaviour = B43_LED_ASSOC;
++-			break;
++-		case 2:
++-			*behaviour = B43_LED_RADIO_A;
++-			break;
++-		case 3:
++-			*behaviour = B43_LED_OFF;
++-			break;
++-		default:
++-			*behaviour = B43_LED_OFF;
++-			B43_WARN_ON(1);
++-			return;
++-		}
++-	} else {
++-		*behaviour = sprom[led_index] & B43_LED_BEHAVIOUR;
++-		*activelow = !!(sprom[led_index] & B43_LED_ACTIVELOW);
++-	}
+++static const char* create_mac80211_trigger(struct b43_wldev *dev, const char * trigger) {
+++    if (!strcmp(trigger, "tx"))
+++        return ieee80211_get_tx_led_name(dev->wl->hw);
+++    if (!strcmp(trigger, "rx"))
+++        return ieee80211_get_rx_led_name(dev->wl->hw);
+++    if (!strcmp(trigger, "radio"))
+++        return ieee80211_get_radio_led_name(dev->wl->hw);
+++    if (!strcmp(trigger, "assoc"))
+++        return ieee80211_get_assoc_led_name(dev->wl->hw);
+++    if (!strcmp(trigger, "tpt"))
+++        return ieee80211_create_tpt_led_trigger(dev->wl->hw, 
+++                         IEEE80211_TPT_LEDTRIG_FL_RADIO, 
+++                         b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink));
+++    return NULL;
+++}
+++
+++static void b43_leds_modparam(struct b43_wldev *dev) {
+++    u8 gpio;
+++    const char *trigger;
+++    bool activelow;
+++    char *conf = modparam_leds, *field;
+++
+++    do {
+++        field = strsep(&conf, ",");
+++
+++        /* parse gpio pin */
+++        gpio = simple_strtoul(strsep(&field, ":"), NULL, 10);
+++        if (field == NULL) /* bad format */
+++            continue;
+++        
+++        /* parse trigger */
+++        trigger = create_mac80211_trigger(dev, strsep(&field, ":"));
+++        if (trigger == NULL) /* unknown trigger */
+++            continue;
+++        
+++        /* activelow is optional */
+++        if (field == NULL)
+++            activelow = true;
+++        else {
+++            if (strtobool(field, &activelow))
+++                continue; /* bad format */
+++        }
+++
+++        b43_register_led(dev, trigger, gpio, activelow);
+++    }
+++    while (conf != NULL);
+++}
+++
+++static void b43_leds_sprominfo(struct b43_wldev *dev) {
+++    if (dev->dev->bus_sprom->gpio0 == 0xFF &&
+++        dev->dev->bus_sprom->gpio1 == 0xFF &&
+++        dev->dev->bus_sprom->gpio2 == 0xFF &&
+++        dev->dev->bus_sprom->gpio3 == 0xFF) {
+++        /* no led configuration found, register a led with hard coded configuration */
+++        b43_register_led(dev,
+++                         ieee80211_create_tpt_led_trigger(dev->wl->hw, IEEE80211_TPT_LEDTRIG_FL_RADIO,
+++                             b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink)),
+++                         0 /* gpio 0 */, true /* activelow */);
+++        return;
+++    }
+++    
+++    b43_map_led(dev, 0, dev->dev->bus_sprom->gpio0);
+++    b43_map_led(dev, 1, dev->dev->bus_sprom->gpio1);
+++    b43_map_led(dev, 2, dev->dev->bus_sprom->gpio2);
+++    b43_map_led(dev, 3, dev->dev->bus_sprom->gpio3);   
++ }
++ 
++ void b43_leds_init(struct b43_wldev *dev)
++ {
++-	struct b43_led *led;
++-	unsigned int i;
++-	enum b43_led_behaviour behaviour;
++-	bool activelow;
++-
++-	/* Sync the RF-kill LED state (if we have one) with radio and switch states. */
++-	led = &dev->wl->leds.led_radio;
++-	if (led->wl) {
++-		if (dev->phy.radio_on && b43_is_hw_radio_enabled(dev)) {
++-			b43_led_turn_on(dev, led->index, led->activelow);
++-			led->hw_state = true;
++-			atomic_set(&led->state, 1);
++-		} else {
++-			b43_led_turn_off(dev, led->index, led->activelow);
++-			led->hw_state = false;
++-			atomic_set(&led->state, 0);
++-		}
++-	}
++-
++-	/* Initialize TX/RX/ASSOC leds */
++-	led = &dev->wl->leds.led_tx;
++-	if (led->wl) {
++-		b43_led_turn_off(dev, led->index, led->activelow);
++-		led->hw_state = false;
++-		atomic_set(&led->state, 0);
++-	}
++-	led = &dev->wl->leds.led_rx;
++-	if (led->wl) {
++-		b43_led_turn_off(dev, led->index, led->activelow);
++-		led->hw_state = false;
++-		atomic_set(&led->state, 0);
++-	}
++-	led = &dev->wl->leds.led_assoc;
++-	if (led->wl) {
++-		b43_led_turn_off(dev, led->index, led->activelow);
++-		led->hw_state = false;
++-		atomic_set(&led->state, 0);
++-	}
++-
++-	/* Initialize other LED states. */
++-	for (i = 0; i < B43_MAX_NR_LEDS; i++) {
++-		b43_led_get_sprominfo(dev, i, &behaviour, &activelow);
++-		switch (behaviour) {
++-		case B43_LED_OFF:
++-			b43_led_turn_off(dev, i, activelow);
++-			break;
++-		case B43_LED_ON:
++-			b43_led_turn_on(dev, i, activelow);
++-			break;
++-		default:
++-			/* Leave others as-is. */
++-			break;
++-		}
++-	}
++-
++ 	dev->wl->leds.stop = 0;
++ }
++ 
++ void b43_leds_exit(struct b43_wldev *dev)
++ {
+++    int i;
++ 	struct b43_leds *leds = &dev->wl->leds;
++ 
++-	b43_led_turn_off(dev, leds->led_tx.index, leds->led_tx.activelow);
++-	b43_led_turn_off(dev, leds->led_rx.index, leds->led_rx.activelow);
++-	b43_led_turn_off(dev, leds->led_assoc.index, leds->led_assoc.activelow);
++-	b43_led_turn_off(dev, leds->led_radio.index, leds->led_radio.activelow);
+++    for (i=0; i<leds->led_count; i++)
+++        b43_led_turn_off(dev, leds->leds[i].index, leds->leds[i].activelow);
++ }
++ 
++ void b43_leds_stop(struct b43_wldev *dev)
++@@ -335,25 +315,21 @@
++ 
++ void b43_leds_register(struct b43_wldev *dev)
++ {
++-	unsigned int i;
++-	enum b43_led_behaviour behaviour;
++-	bool activelow;
++-
++-	INIT_WORK(&dev->wl->leds.work, b43_leds_work);
+++	b43dbg(dev->wl, "leds configuration: %s\n", modparam_leds);
++ 
++ 	/* Register the LEDs to the LED subsystem. */
++-	for (i = 0; i < B43_MAX_NR_LEDS; i++) {
++-		b43_led_get_sprominfo(dev, i, &behaviour, &activelow);
++-		b43_map_led(dev, i, behaviour, activelow);
++-	}
+++    if (strlen(modparam_leds) > 0)
+++        b43_leds_modparam(dev);
+++    else
+++        b43_leds_sprominfo(dev);
+++
+++	INIT_WORK(&dev->wl->leds.work, b43_leds_work);
++ }
++ 
++ void b43_leds_unregister(struct b43_wl *wl)
++ {
++ 	struct b43_leds *leds = &wl->leds;
++ 
++-	b43_unregister_led(&leds->led_tx);
++-	b43_unregister_led(&leds->led_rx);
++-	b43_unregister_led(&leds->led_assoc);
++-	b43_unregister_led(&leds->led_radio);
+++    while(leds->led_count > 0)
+++        b43_unregister_led(&leds->leds[leds->led_count--]);
++ }
++Index: b/drivers/net/wireless/b43/leds.h
++===================================================================
++--- a/drivers/net/wireless/b43/leds.h
+++++ b/drivers/net/wireless/b43/leds.h
++@@ -30,18 +30,15 @@
++ 	bool hw_state;
++ };
++ 
++-struct b43_leds {
++-	struct b43_led led_tx;
++-	struct b43_led led_rx;
++-	struct b43_led led_radio;
++-	struct b43_led led_assoc;
+++#define B43_MAX_NR_LEDS			4
++ 
+++struct b43_leds {
+++    struct b43_led leds[B43_MAX_NR_LEDS];
+++    u8 led_count;
++ 	bool stop;
++ 	struct work_struct work;
++ };
++ 
++-#define B43_MAX_NR_LEDS			4
++-
++ #define B43_LED_BEHAVIOUR		0x7F
++ #define B43_LED_ACTIVELOW		0x80
++ /* LED behaviour values */
