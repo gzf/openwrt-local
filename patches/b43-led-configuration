@@ -2,7 +2,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ===================================================================
 --- /dev/null
 +++ b/package/mac80211/patches/840-b43-led-configuration-param.patch
-@@ -0,0 +1,415 @@
+@@ -0,0 +1,447 @@
 +Index: b/drivers/net/wireless/b43/leds.c
 +===================================================================
 +--- a/drivers/net/wireless/b43/leds.c
@@ -82,7 +82,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 	return 0;
 + }
 + 
-+@@ -156,173 +163,146 @@
++@@ -156,173 +163,158 @@
 + 	led->wl = NULL;
 + }
 + 
@@ -268,11 +268,12 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ++        dev->dev->bus_sprom->gpio1 == 0xFF &&
 ++        dev->dev->bus_sprom->gpio2 == 0xFF &&
 ++        dev->dev->bus_sprom->gpio3 == 0xFF) {
-++        /* no led configuration found, register a led with hard coded configuration */
-++        b43_register_led(dev,
-++                         ieee80211_create_tpt_led_trigger(dev->wl->hw, IEEE80211_TPT_LEDTRIG_FL_RADIO,
-++                             b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink)),
-++                         0 /* gpio 0 */, true /* activelow */);
+++        /* no led configuration found, register leds with hard coded configuration */
+++        b43_register_led(dev, ieee80211_create_tpt_led_trigger(dev->wl->hw, IEEE80211_TPT_LEDTRIG_FL_RADIO,
+++                            b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink)),
+++                         0 /* gpio */, true /* activelow */);
+++        b43_register_led(dev, ieee80211_get_radio_led_name(dev->wl->hw),
+++                         1 /* gpio */, false /* activelow */);
 ++        return;
 ++    }
 ++    
@@ -338,8 +339,19 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +-			break;
 +-		}
 +-	}
-+-
-+ 	dev->wl->leds.stop = 0;
+++    int i;
+++	struct b43_leds *leds = &dev->wl->leds;
+++    struct b43_led *led = NULL;
+++    
+++    for (i=0; i<leds->led_count; i++) {
+++        led = &leds->leds[i];
+++        b43_led_turn_off(dev, led->index, led->activelow);
+++        led->hw_state = false;
+++        atomic_set(&led->state, 0);
+++    }
++ 
++-	dev->wl->leds.stop = 0;
+++	leds->stop = 0;
 + }
 + 
 + void b43_leds_exit(struct b43_wldev *dev)
@@ -356,7 +368,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + }
 + 
 + void b43_leds_stop(struct b43_wldev *dev)
-+@@ -335,25 +315,21 @@
++@@ -335,25 +327,21 @@
 + 
 + void b43_leds_register(struct b43_wldev *dev)
 + {
@@ -389,7 +401,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +-	b43_unregister_led(&leds->led_assoc);
 +-	b43_unregister_led(&leds->led_radio);
 ++    while(leds->led_count > 0)
-++        b43_unregister_led(&leds->leds[leds->led_count--]);
+++        b43_unregister_led(&leds->leds[--leds->led_count]);
 + }
 +Index: b/drivers/net/wireless/b43/leds.h
 +===================================================================
@@ -418,3 +430,23 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + #define B43_LED_BEHAVIOUR		0x7F
 + #define B43_LED_ACTIVELOW		0x80
 + /* LED behaviour values */
++Index: b/drivers/net/wireless/b43/main.c
++===================================================================
++--- a/drivers/net/wireless/b43/main.c
+++++ b/drivers/net/wireless/b43/main.c
++@@ -2423,11 +2423,14 @@
++ 	if (!modparam_qos || dev->fw.opensource)
++ 		wl->hw->queues = 1;
++ 
+++    /* register LED before ieee80211_register_hw
+++     * see drivers/net/wireless/ath/ath9k/init.c
+++     */
+++    b43_leds_register(wl->current_dev);
++ 	err = ieee80211_register_hw(wl->hw);
++ 	if (err)
++ 		goto err_one_core_detach;
++ 	wl->hw_registred = true;
++-	b43_leds_register(wl->current_dev);
++ 	goto out;
++ 
++ err_one_core_detach:
