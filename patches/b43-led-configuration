@@ -2,7 +2,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ===================================================================
 --- /dev/null
 +++ b/package/mac80211/patches/840-b43-led-configuration-param.patch
-@@ -0,0 +1,447 @@
+@@ -0,0 +1,445 @@
 +Index: b/drivers/net/wireless/b43/leds.c
 +===================================================================
 +--- a/drivers/net/wireless/b43/leds.c
@@ -82,7 +82,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 	return 0;
 + }
 + 
-+@@ -156,173 +163,158 @@
++@@ -156,173 +163,135 @@
 + 	led->wl = NULL;
 + }
 + 
@@ -90,19 +90,6 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +-			u8 led_index,
 +-			enum b43_led_behaviour behaviour,
 +-			bool activelow)
-++static const struct ieee80211_tpt_blink b43_tpt_blink[] = {
-++    { .throughput = 0 * 1024, .blink_time = 334 },
-++    { .throughput = 1 * 1024, .blink_time = 260 },
-++    { .throughput = 5 * 1024, .blink_time = 220 },
-++    { .throughput = 10 * 1024, .blink_time = 190 },
-++    { .throughput = 20 * 1024, .blink_time = 170 },
-++    { .throughput = 50 * 1024, .blink_time = 150 },
-++    { .throughput = 70 * 1024, .blink_time = 130 },
-++    { .throughput = 100 * 1024, .blink_time = 110 },
-++    { .throughput = 200 * 1024, .blink_time = 80 },
-++    { .throughput = 300 * 1024, .blink_time = 50 },
-++};
-++
 ++static void b43_map_led(struct b43_wldev *dev, u8 gpio, u8 sprom_conf)
 + {
 + 	struct ieee80211_hw *hw = dev->wl->hw;
@@ -137,10 +124,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +-		b43_register_led(dev, &dev->wl->leds.led_rx, name,
 +-				 ieee80211_get_rx_led_name(hw),
 +-				 led_index, activelow);
-++		b43_register_led(dev,
-++                         ieee80211_create_tpt_led_trigger(hw, IEEE80211_TPT_LEDTRIG_FL_RADIO, 
-++                             b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink)),
-++                         gpio, activelow);
+++		b43_register_led(dev, dev->wl->leds.trig_tpt, gpio, activelow);
 + 		break;
 + 	case B43_LED_RADIO_ALL:
 + 	case B43_LED_RADIO_A:
@@ -149,20 +133,18 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +-		snprintf(name, sizeof(name),
 +-			 "b43-%s::radio", wiphy_name(hw->wiphy));
 +-		b43_register_led(dev, &dev->wl->leds.led_radio, name,
-++		b43_register_led(dev,
-+ 				 ieee80211_get_radio_led_name(hw),
++-				 ieee80211_get_radio_led_name(hw),
 +-				 led_index, activelow);
-++				 gpio, activelow);
+++		b43_register_led(dev, ieee80211_get_radio_led_name(hw), gpio, activelow);
 + 		break;
 + 	case B43_LED_WEIRD:
 + 	case B43_LED_ASSOC:
 +-		snprintf(name, sizeof(name),
 +-			 "b43-%s::assoc", wiphy_name(hw->wiphy));
 +-		b43_register_led(dev, &dev->wl->leds.led_assoc, name,
-++		b43_register_led(dev,
-+ 				 ieee80211_get_assoc_led_name(hw),
++-				 ieee80211_get_assoc_led_name(hw),
 +-				 led_index, activelow);
-++				 gpio, activelow);
+++		b43_register_led(dev, ieee80211_get_assoc_led_name(hw), gpio, activelow);
 + 		break;
 + 	default:
 + 		b43warn(dev->wl, "LEDs: Unknown behaviour 0x%02X\n",
@@ -215,7 +197,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +-		*behaviour = sprom[led_index] & B43_LED_BEHAVIOUR;
 +-		*activelow = !!(sprom[led_index] & B43_LED_ACTIVELOW);
 +-	}
-++static const char* create_mac80211_trigger(struct b43_wldev *dev, const char * trigger) {
+++static const char* get_mac80211_trigger(struct b43_wldev *dev, const char * trigger) {
 ++    if (!strcmp(trigger, "tx"))
 ++        return ieee80211_get_tx_led_name(dev->wl->hw);
 ++    if (!strcmp(trigger, "rx"))
@@ -225,9 +207,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ++    if (!strcmp(trigger, "assoc"))
 ++        return ieee80211_get_assoc_led_name(dev->wl->hw);
 ++    if (!strcmp(trigger, "tpt"))
-++        return ieee80211_create_tpt_led_trigger(dev->wl->hw, 
-++                         IEEE80211_TPT_LEDTRIG_FL_RADIO, 
-++                         b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink));
+++        return dev->wl->leds.trig_tpt;
 ++    return NULL;
 ++}
 ++
@@ -246,8 +226,8 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ++            continue;
 ++        
 ++        /* parse trigger */
-++        trigger = create_mac80211_trigger(dev, strsep(&field, ":"));
-++        if (trigger == NULL) /* unknown trigger */
+++        trigger = get_mac80211_trigger(dev, strsep(&field, ":"));
+++        if (trigger == NULL) /* invalid trigger specified */
 ++            continue;
 ++        
 ++        /* activelow is optional */
@@ -255,7 +235,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ++            activelow = true;
 ++        else {
 ++            if (strtobool(field, &activelow))
-++                continue; /* bad format */
+++                continue; /* invalid activelow (bool) specified */
 ++        }
 ++
 ++        b43_register_led(dev, trigger, gpio, activelow);
@@ -268,12 +248,11 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ++        dev->dev->bus_sprom->gpio1 == 0xFF &&
 ++        dev->dev->bus_sprom->gpio2 == 0xFF &&
 ++        dev->dev->bus_sprom->gpio3 == 0xFF) {
-++        /* no led configuration found, register leds with hard coded configuration */
-++        b43_register_led(dev, ieee80211_create_tpt_led_trigger(dev->wl->hw, IEEE80211_TPT_LEDTRIG_FL_RADIO,
-++                            b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink)),
-++                         0 /* gpio */, true /* activelow */);
-++        b43_register_led(dev, ieee80211_get_radio_led_name(dev->wl->hw),
-++                         1 /* gpio */, false /* activelow */);
+++        /* no led configuration found, register leds with hard coded configuration
+++         * leds=0:tpt,1:radio:0
+++         */
+++        b43_map_led(dev, 0, B43_LED_ACTIVITY | B43_LED_ACTIVELOW);
+++        b43_map_led(dev, 1, B43_LED_RADIO_ALL);
 ++        return;
 ++    }
 ++    
@@ -368,16 +347,34 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + }
 + 
 + void b43_leds_stop(struct b43_wldev *dev)
-+@@ -335,25 +327,21 @@
++@@ -333,27 +302,40 @@
++ 	cancel_work_sync(&leds->work);
++ }
 + 
+++static const struct ieee80211_tpt_blink b43_tpt_blink[] = {
+++    { .throughput = 0 * 1024, .blink_time = 334 },
+++    { .throughput = 1 * 1024, .blink_time = 260 },
+++    { .throughput = 5 * 1024, .blink_time = 220 },
+++    { .throughput = 10 * 1024, .blink_time = 190 },
+++    { .throughput = 20 * 1024, .blink_time = 170 },
+++    { .throughput = 50 * 1024, .blink_time = 150 },
+++    { .throughput = 70 * 1024, .blink_time = 130 },
+++    { .throughput = 100 * 1024, .blink_time = 110 },
+++    { .throughput = 200 * 1024, .blink_time = 80 },
+++    { .throughput = 300 * 1024, .blink_time = 50 },
+++};
+++
 + void b43_leds_register(struct b43_wldev *dev)
 + {
 +-	unsigned int i;
 +-	enum b43_led_behaviour behaviour;
 +-	bool activelow;
-+-
-+-	INIT_WORK(&dev->wl->leds.work, b43_leds_work);
 ++	b43dbg(dev->wl, "leds configuration: %s\n", modparam_leds);
++ 
++-	INIT_WORK(&dev->wl->leds.work, b43_leds_work);
+++    /* create the tpt trigger first */
+++    dev->wl->leds.trig_tpt = ieee80211_create_tpt_led_trigger(dev->wl->hw, IEEE80211_TPT_LEDTRIG_FL_RADIO, 
+++                                     b43_tpt_blink, ARRAY_SIZE(b43_tpt_blink));
 + 
 + 	/* Register the LEDs to the LED subsystem. */
 +-	for (i = 0; i < B43_MAX_NR_LEDS; i++) {
@@ -407,7 +404,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +===================================================================
 +--- a/drivers/net/wireless/b43/leds.h
 ++++ b/drivers/net/wireless/b43/leds.h
-+@@ -30,18 +30,15 @@
++@@ -30,18 +30,16 @@
 + 	bool hw_state;
 + };
 + 
@@ -421,6 +418,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 ++struct b43_leds {
 ++    struct b43_led leds[B43_MAX_NR_LEDS];
 ++    u8 led_count;
+++    const char *trig_tpt; /* the tpt trigger is special, needs to be created first */
 + 	bool stop;
 + 	struct work_struct work;
 + };
