@@ -1,0 +1,18 @@
+Index: b/target/linux/brcm63xx/profiles/100-Broadcom.mk
+===================================================================
+--- a/target/linux/brcm63xx/profiles/100-Broadcom.mk
++++ b/target/linux/brcm63xx/profiles/100-Broadcom.mk
+@@ -15,3 +15,13 @@
+ endef
+ $(eval $(call Profile,Broadcom))
+ 
++define Profile/BroadcomUSB
++  NAME:=Broadcom WiFi with USB ports
++  PACKAGES:=kmod-b43 wpad-mini kmod-usb2 kmod-usb-ohci
++endef
++
++define Profile/Broadcom/Description
++	Package set compatible with hardware using Broadcom WiFi cards
++	and usb ports
++endef
++$(eval $(call Profile,BroadcomUSB))
