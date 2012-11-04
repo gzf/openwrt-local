@@ -1,0 +1,116 @@
+Index: b/feeds/packages/net/git/Makefile
+===================================================================
+--- a/feeds/packages/net/git/Makefile
++++ b/feeds/packages/net/git/Makefile
+@@ -17,6 +17,7 @@
+ 
+ PKG_INSTALL:=1
+ PKG_BUILD_PARALLEL:=1
++PKG_FIXUP:=autoreconf
+ 
+ include $(INCLUDE_DIR)/package.mk
+ 
+@@ -24,7 +25,7 @@
+   SECTION:=net
+   CATEGORY:=Network
+   SUBMENU:=Version Control Systems
+-  DEPENDS:=+libopenssl +libpthread
++  DEPENDS:=+libopenssl +libpthread +libcurl +libexpat
+   TITLE:=The fast version control system
+   URL:=http://git-scm.com
+ endef
+@@ -40,8 +41,6 @@
+ 	CFLAGS="$(TARGET_CFLAGS)" \
+ 	CPPFLAGS="$(TARGET_CPPFLAGS)" \
+ 	LDFLAGS="$(TARGET_LDFLAGS)" \
+-	NO_CURL="YesPlease" \
+-	NO_EXPAT="YesPlease" \
+ 	NO_MKSTEMPS="YesPlease" \
+ 	NO_GETTEXT="YesPlease" \
+ 	NO_UNIX_SOCKETS="YesPlease" \
+@@ -52,14 +51,7 @@
+ 	NO_PYTHON="YesPlease" \
+ 	NO_TCLTK="YesPlease"
+ 
+-define Build/Configure
+-	$(MAKE) -C $(PKG_BUILD_DIR) \
+-		configure
+-
+-	( cd $(PKG_BUILD_DIR); \
+-		./configure --prefix=/usr \
+-	);
+-endef
++CONFIGURE_ARGS += --prefix=/usr --with-curl --with-expat
+ 
+ define Package/git/install
+ 	$(INSTALL_DIR) $(1)
+Index: b/feeds/packages/net/git/patches/200-fix-cross-compile-configure
+===================================================================
+--- /dev/null
++++ b/feeds/packages/net/git/patches/200-fix-cross-compile-configure
+@@ -0,0 +1,65 @@
++Index: b/configure.ac
++===================================================================
++--- a/configure.ac
+++++ b/configure.ac
++@@ -784,56 +784,15 @@
++ #
++ # Define FREAD_READS_DIRECTORIES if your are on a system which succeeds
++ # when attempting to read from an fopen'ed directory.
++-AC_CACHE_CHECK([whether system succeeds to read fopen'ed directory],
++- [ac_cv_fread_reads_directories],
++-[
++-AC_RUN_IFELSE(
++-	[AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT],
++-		[[char c;
++-		FILE *f = fopen(".", "r");
++-		return f && fread(&c, 1, 1, f)]])],
++-	[ac_cv_fread_reads_directories=no],
++-	[ac_cv_fread_reads_directories=yes])
++-])
++-if test $ac_cv_fread_reads_directories = yes; then
++-	FREAD_READS_DIRECTORIES=UnfortunatelyYes
++-else
++-	FREAD_READS_DIRECTORIES=
++-fi
+++#FREAD_READS_DIRECTORIES=UnfortunatelyYes
+++FREAD_READS_DIRECTORIES=
++ AC_SUBST(FREAD_READS_DIRECTORIES)
++ #
++ # Define SNPRINTF_RETURNS_BOGUS if your are on a system which snprintf()
++ # or vsnprintf() return -1 instead of number of characters which would
++ # have been written to the final string if enough space had been available.
++-AC_CACHE_CHECK([whether snprintf() and/or vsnprintf() return bogus value],
++- [ac_cv_snprintf_returns_bogus],
++-[
++-AC_RUN_IFELSE(
++-	[AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT
++-		#include "stdarg.h"
++-
++-		int test_vsnprintf(char *str, size_t maxsize, const char *format, ...)
++-		{
++-		  int ret;
++-		  va_list ap;
++-		  va_start(ap, format);
++-		  ret = vsnprintf(str, maxsize, format, ap);
++-		  va_end(ap);
++-		  return ret;
++-		}],
++-		[[char buf[6];
++-		  if (test_vsnprintf(buf, 3, "%s", "12345") != 5
++-		      || strcmp(buf, "12")) return 1;
++-		  if (snprintf(buf, 3, "%s", "12345") != 5
++-		      || strcmp(buf, "12")) return 1]])],
++-	[ac_cv_snprintf_returns_bogus=no],
++-	[ac_cv_snprintf_returns_bogus=yes])
++-])
++-if test $ac_cv_snprintf_returns_bogus = yes; then
++-	SNPRINTF_RETURNS_BOGUS=UnfortunatelyYes
++-else
++-	SNPRINTF_RETURNS_BOGUS=
++-fi
+++#SNPRINTF_RETURNS_BOGUS=UnfortunatelyYes
+++SNPRINTF_RETURNS_BOGUS=
++ AC_SUBST(SNPRINTF_RETURNS_BOGUS)
++ 
++ 

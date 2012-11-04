@@ -13,3 +13,4 @@ change-button-hotplug-behavior-and-name-mapping
 brcm63xx-adopts-kmod-gpio-button-hotplug
 b43-led-configuration
 add-bcm63xx-profile-with-usb-hci-drivers
+pkg-git-customization
