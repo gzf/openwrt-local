@@ -1,25 +1,5 @@
-CONFIG_TARGET_ar71xx=y
-CONFIG_TARGET_ar71xx_generic=y
-# build firmware for MW4530R by default
-CONFIG_TARGET_ar71xx_generic_MCMW4530R=y
-
-#CONFIG_TARGET_brcm63xx=y
-#CONFIG_TARGET_brcm63xx_Broadcom=y
-
-# build all kmod packages
-CONFIG_ALL_KMODS=y
-# specify vermagic if necessary
+# ar71xx vermagic
 CONFIG_KERNEL_VERMAGIC="6c06ba2494c9c458b747d6a40b2cc970"
-
-# build-in 3G modem support
-CONFIG_PACKAGE_kmod-usb-serial=y
-CONFIG_PACKAGE_kmod-usb-serial-option=y
-CONFIG_PACKAGE_comgt=y
-CONFIG_PACKAGE_usb-modeswitch=y
-CONFIG_PACKAGE_usb-modeswitch-data=y
-
-# ohci, useless?
-CONFIG_PACKAGE_kmod-usb-ohci=y
 
 # luci
 CONFIG_PACKAGE_luci=y
@@ -33,14 +13,3 @@ CONFIG_PACKAGE_uhttpd-mod-tls_cyassl=y
 # Disable some kmods
 # CONFIG_PACKAGE_kmod-ebtables is not set
 # CONFIG_PACKAGE_kmod-libertas-sd is not set
-
-# local feeds
-CONFIG_PACKAGE_vim-small=m
-CONFIG_PACKAGE_ez-ipupdate-3322=m
-CONFIG_PACKAGE_autofs5=m
-CONFIG_PACKAGE_autofs5-mount-ext2=m
-
-# third-party feeds
-CONFIG_PACKAGE_mwan3=m
-CONFIG_PACKAGE_luci-app-mwan3=m
-
