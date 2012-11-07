@@ -32,7 +32,7 @@ Index: b/feeds/packages/net/git/Makefile
  	NO_MKSTEMPS="YesPlease" \
  	NO_GETTEXT="YesPlease" \
  	NO_UNIX_SOCKETS="YesPlease" \
-@@ -50,16 +45,10 @@
+@@ -50,21 +45,15 @@
  	NO_NSEC="YesPlease" \
  	NO_PERL="YesPlease" \
  	NO_PYTHON="YesPlease" \
@@ -48,20 +48,45 @@ Index: b/feeds/packages/net/git/Makefile
 -		./configure --prefix=/usr \
 -	);
 -endef
-+CONFIGURE_ARGS += --prefix=/usr --with-curl --with-expat
++CONFIGURE_ARGS += --with-curl --with-expat
  
  define Package/git/install
- 	$(INSTALL_DIR) $(1)
+-	$(INSTALL_DIR) $(1)
+-	$(RM) $(PKG_INSTALL_DIR)/usr/bin/git-cvsserver
+-	$(CP) $(PKG_INSTALL_DIR)/* $(1)/
++	$(INSTALL_DIR) $(1)/usr
++	$(CP) $(PKG_INSTALL_DIR)/usr/bin $(1)/usr
++	$(CP) $(PKG_INSTALL_DIR)/usr/lib $(1)/usr
+ endef
+ 
+ $(eval $(call BuildPackage,git))
 Index: b/feeds/packages/net/git/patches/010-make-git-an-so
 ===================================================================
 --- /dev/null
 +++ b/feeds/packages/net/git/patches/010-make-git-an-so
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,115 @@
 +Index: b/Makefile
 +===================================================================
 +--- a/Makefile
 ++++ b/Makefile
-+@@ -904,7 +904,7 @@
++@@ -340,6 +340,7 @@
++ prefix = $(HOME)
++ bindir_relative = bin
++ bindir = $(prefix)/$(bindir_relative)
+++libdir = $(prefix)/lib
++ mandir = share/man
++ infodir = share/info
++ gitexecdir = libexec/git-core
++@@ -355,7 +356,7 @@
++ # DESTDIR=
++ pathsep = :
++ 
++-export prefix bindir sharedir sysconfdir gitwebdir localedir
+++export prefix bindir libdir sharedir sysconfdir gitwebdir localedir
++ 
++ CC = cc
++ AR = ar
++@@ -904,7 +905,7 @@
 + BUILTIN_OBJS += builtin/verify-tag.o
 + BUILTIN_OBJS += builtin/write-tree.o
 + 
@@ -70,7 +95,15 @@ Index: b/feeds/packages/net/git/patches/010-make-git-an-so
 + EXTLIBS =
 + 
 + #
-+@@ -1975,9 +1975,8 @@
++@@ -1879,6 +1880,7 @@
++ DESTDIR_SQ = $(subst ','\'',$(DESTDIR))
++ bindir_SQ = $(subst ','\'',$(bindir))
++ bindir_relative_SQ = $(subst ','\'',$(bindir_relative))
+++libdir_SQ = $(subst ','\'',$(libdir))
++ mandir_SQ = $(subst ','\'',$(mandir))
++ infodir_SQ = $(subst ','\'',$(infodir))
++ localedir_SQ = $(subst ','\'',$(localedir))
++@@ -1975,9 +1977,8 @@
 + 	'-DGIT_MAN_PATH="$(mandir_SQ)"' \
 + 	'-DGIT_INFO_PATH="$(infodir_SQ)"'
 + 
@@ -82,7 +115,7 @@ Index: b/feeds/packages/net/git/patches/010-make-git-an-so
 + 
 + help.sp help.o: common-cmds.h
 + 
-+@@ -2104,7 +2103,7 @@
++@@ -2104,7 +2105,7 @@
 + 
 + TEST_OBJS := $(patsubst test-%$X,test-%.o,$(TEST_PROGRAMS))
 + GIT_OBJS := $(LIB_OBJS) $(BUILTIN_OBJS) $(PROGRAM_OBJS) $(TEST_OBJS) \
@@ -91,7 +124,7 @@ Index: b/feeds/packages/net/git/patches/010-make-git-an-so
 + ifndef NO_CURL
 + 	GIT_OBJS += http.o http-walker.o remote-curl.o
 + endif
-+@@ -2308,11 +2307,10 @@
++@@ -2308,11 +2309,10 @@
 + 	$(QUIET_LINK)$(CC) $(ALL_CFLAGS) -o $@ $(ALL_LDFLAGS) $(filter %.o,$^) \
 + 		$(LIBS) $(CURL_LIBCURL) $(EXPAT_LIBEXPAT)
 + 
@@ -107,6 +140,23 @@ Index: b/feeds/packages/net/git/patches/010-make-git-an-so
 + 
 + $(VCSSVN_LIB): $(VCSSVN_OBJS)
 + 	$(QUIET_AR)$(RM) $@ && $(AR) rcs $@ $(VCSSVN_OBJS)
++@@ -2557,6 +2557,8 @@
++ 
++ install: all
++ 	$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(bindir_SQ)'
+++	$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(libdir_SQ)'
+++	$(INSTALL) -m 755 $(GITLIBS) '$(DESTDIR_SQ)$(libdir_SQ)'
++ 	$(INSTALL) -d -m 755 '$(DESTDIR_SQ)$(gitexec_instdir_SQ)'
++ 	$(INSTALL) $(ALL_PROGRAMS) '$(DESTDIR_SQ)$(gitexec_instdir_SQ)'
++ 	$(INSTALL) -m 644 $(SCRIPT_LIB) '$(DESTDIR_SQ)$(gitexec_instdir_SQ)'
++@@ -2591,6 +2593,7 @@
++ 		$(RM) "$$execdir/$$p" && \
++ 		test -z "$(NO_INSTALL_HARDLINKS)$(NO_CROSS_DIRECTORY_HARDLINKS)" && \
++ 		ln "$$bindir/$$p" "$$execdir/$$p" 2>/dev/null || \
+++		ln -s "$(bindir)/$$p" "$$execdir/$$p" 2>/dev/null || \
++ 		cp "$$bindir/$$p" "$$execdir/$$p" || exit; \
++ 	  done; \
++ 	} && \
 +Index: b/git-cli.c
 +===================================================================
 +--- /dev/null
