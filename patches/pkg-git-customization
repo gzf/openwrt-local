@@ -2,7 +2,7 @@ Index: b/feeds/packages/net/git/Makefile
 ===================================================================
 --- a/feeds/packages/net/git/Makefile
 +++ b/feeds/packages/net/git/Makefile
-@@ -17,54 +17,109 @@
+@@ -17,54 +17,106 @@
  
  PKG_INSTALL:=1
  PKG_BUILD_PARALLEL:=1
@@ -44,6 +44,15 @@ Index: b/feeds/packages/net/git/Makefile
 +  TITLE+= (http-push)
 +endef
 +
++FL-git-remote-curl := git-remote-http git-remote-https \
++		 		 	 git-remote-ftp git-remote-ftps
++FL-git-http-fetch := git-http-fetch
++FL-git-http-push  := git-http-push
++
++# compile configuration
++MAKE_FLAGS := NO_INSTALL_HARDLINKS=YesPlease
++
++# description configuration
  define Package/git/description
   Git is a free & open source, distributed version control system
   designed to handle everything from small to very large projects
@@ -75,36 +84,28 @@ Index: b/feeds/packages/net/git/Makefile
 -	( cd $(PKG_BUILD_DIR); \
 -		./configure --prefix=/usr \
 -	);
-+define Package/git-remote-curl/description
-+ This package contains: 
-+    git-remote-http
-+    git-remote-https
-+    git-remote-ftp
-+    git-remote-ftps
++define DescriptionTempalte
++define Package/$(1)/description
++ This package contains:
++  $(FL-$(1))
  endef
- 
-+define Package/git-http-fetch/description
-+ This package contains: 
-+    git-http-fetch
 +endef
 +
-+define Package/git-http-push/description
-+ This package contains: 
-+    git-http-push
-+endef
++$(eval $(call DescriptionTempalte,git-remote-curl))
++$(eval $(call DescriptionTempalte,git-http-fetch))
++$(eval $(call DescriptionTempalte,git-http-push))
 +
-+#========================================================================#
-+
-+MAKE_FLAGS := NO_INSTALL_HARDLINKS=YesPlease
++# install configuration
 +GIT_CORE := usr/lib/git-core
-+
+ 
  define Package/git/install
 -	$(INSTALL_DIR) $(1)
 -	$(RM) $(PKG_INSTALL_DIR)/usr/bin/git-cvsserver
 -	$(CP) $(PKG_INSTALL_DIR)/* $(1)/
 +	$(INSTALL_DIR) $(1)/usr/bin
++	$(CP) $(PKG_INSTALL_DIR)/usr/bin/git  $(1)/usr/bin
 +	for FILE in $(PKG_INSTALL_DIR)/usr/bin/*; do \
-+		if [ `basename $$$$FILE` = git ] || ([ -h $$$$FILE ] && [ `readlink $$$$FILE` = git ]); then \
++		if [ -h $$$$FILE ] && [ `readlink $$$$FILE` = git ]; then \
 +			$(CP) $$$$FILE $(1)/usr/bin; \
 +		fi; \
 +	done
@@ -113,30 +114,26 @@ Index: b/feeds/packages/net/git/Makefile
 +		$(CP) $$$$FILE $(1)/usr/lib; \
 +	done
 +	$(INSTALL_DIR) $(1)/$(GIT_CORE)
++	$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/git  $(1)/$(GIT_CORE)
 +	for FILE in $(PKG_INSTALL_DIR)/$(GIT_CORE)/*; do \
-+		if [ -h $$$$FILE ] && ([ `readlink $$$$FILE` = git ] || [ `basename $$$$FILE` = git ]); then \
++		if [ -h $$$$FILE ] && [ `readlink $$$$FILE` = git ]; then \
 +			$(CP) $$$$FILE $(1)/$(GIT_CORE); \
 +		fi; \
 +	done
 +endef
 +
-+define Package/git-remote-curl/install
-+	$(INSTALL_DIR) $(1)/$(GIT_CORE)
-+	$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/git-remote-http  $(1)/$(GIT_CORE)
-+	$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/git-remote-https $(1)/$(GIT_CORE)
-+	$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/git-remote-ftp   $(1)/$(GIT_CORE)
-+	$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/git-remote-ftps  $(1)/$(GIT_CORE)
-+endef
-+
-+define Package/git-http-fetch/install
-+	$(INSTALL_DIR) $(1)/$(GIT_CORE)
-+	$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/git-http-fetch  $(1)/$(GIT_CORE)
-+endef
-+
-+define Package/git-http-push/install
-+	$(INSTALL_DIR) $(1)/$(GIT_CORE)
-+	$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/git-http-push  $(1)/$(GIT_CORE)
++define InstallTemplate
++define Package/$(1)/install
++	$(INSTALL_DIR) $$(1)/$(GIT_CORE)
++	for FILE in $(FL-$(1)); do \
++		$(CP) $(PKG_INSTALL_DIR)/$(GIT_CORE)/$$$$$$$$FILE  $$(1)/$(GIT_CORE); \
++	done
  endef
++endef
++
++$(eval $(call InstallTemplate,git-remote-curl))
++$(eval $(call InstallTemplate,git-http-fetch))
++$(eval $(call InstallTemplate,git-http-push))
  
  $(eval $(call BuildPackage,git))
 +$(eval $(call BuildPackage,git-remote-curl))
