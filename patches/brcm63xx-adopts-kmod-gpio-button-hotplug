@@ -16,7 +16,7 @@ Index: b/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
 ===================================================================
 --- a/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
 +++ b/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
-@@ -4,10 +4,7 @@
+@@ -4,11 +4,7 @@
      . /lib/brcm63xx.sh
  
  	if [ "$brcm63xx_has_reset_button" = "true" ]; then
@@ -24,6 +24,7 @@ Index: b/target/linux/brcm63xx/base-files/lib/preinit/05_reset_button_brcm63xx
 -		insmod input-polldev
 -		insmod gpio_buttons
 -		insmod button-hotplug
+-		insmod gpio_keys_polled
 +		insmod gpio-button-hotplug
  	fi
  }

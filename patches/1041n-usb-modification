@@ -10,7 +10,7 @@ Index: b/target/linux/ar71xx/files/arch/mips/ath79/mach-tl-wr1041n-v2.c
  #include "dev-wmac.h"
  #include "machtypes.h"
  
-@@ -157,6 +158,8 @@
+@@ -141,6 +142,8 @@
  	ath79_eth0_data.mii_bus_dev = &ath79_mdio0_device.dev;
  	ath79_eth0_pll_data.pll_1000 = 0x06000000;
  	ath79_register_eth(0);
