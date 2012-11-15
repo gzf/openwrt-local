@@ -1,6 +1,1 @@
-Working Revision: svn://svn.openwrt.org/openwrt/trunk/@33366
-
-gw install list:
-	git rsync wol ez-ipupdate-3322 vim-small
-	autofs autofs5-mount-ext2 block-mount kmod-usb-storage kmod-fs-ext4
-	openvpn ppp-mod-pptp kmod-ipt-nathelper-extra
+Branch: svn://svn.openwrt.org/openwrt/branches/attitude_adjustment
