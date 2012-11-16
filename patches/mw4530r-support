@@ -12,7 +12,7 @@ Index: b/target/linux/ar71xx/base-files/lib/ar71xx.sh
  	*)
  		hwver=""
  		;;
-@@ -375,6 +378,9 @@
+@@ -378,6 +381,9 @@
  	*"TL-MR11U")
  		name="tl-mr11u"
  		;;
@@ -22,7 +22,7 @@ Index: b/target/linux/ar71xx/base-files/lib/ar71xx.sh
  	*UniFi)
  		name="unifi"
  		;;
-@@ -435,7 +441,7 @@
+@@ -441,7 +447,7 @@
  	esac
  
  	case "$machine" in
@@ -59,9 +59,9 @@ Index: b/target/linux/ar71xx/image/Makefile
 ===================================================================
 --- a/target/linux/ar71xx/image/Makefile
 +++ b/target/linux/ar71xx/image/Makefile
-@@ -832,6 +832,8 @@
- $(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),TLWDR4300V1,tl-wdr4300-v1,TL-WDR4300,ttyS0,115200,0x43000001,1,8Mlzma))
- $(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),TLWDR4310V1,tl-wdr4310-v1,TL-WDR4300,ttyS0,115200,0x43100001,1,8Mlzma))
+@@ -880,6 +880,8 @@
+ 
+ $(eval $(call SingleProfile,UBDEV,$(fs_64k),UBDEV01,ubdev01,UBNT-UF,ttyS0,115200,XM,XM,ar7240))
  
 +$(eval $(call SingleProfile,TPLINK-LZMA,$(fs_64kraw),MCMW4530R,mc-mw4530r,MC-MW4530R,ttyS0,115200,0x45300001,1,8Mlzma))
 +
@@ -286,7 +286,7 @@ Index: b/target/linux/ar71xx/base-files/etc/uci-defaults/network
 ===================================================================
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/network
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/network
-@@ -94,7 +94,8 @@
+@@ -95,7 +95,8 @@
  	;;
  
  tl-wdr4300|\
@@ -377,7 +377,7 @@ Index: b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
 ===================================================================
 --- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
-@@ -145,6 +145,7 @@
+@@ -146,6 +146,7 @@
  		platform_check_image_om2p "$magic_long" "$1" && return 0
  		return 1
  		;;

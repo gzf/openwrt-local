@@ -2,7 +2,7 @@ Index: b/include/kernel-defaults.mk
 ===================================================================
 --- a/include/kernel-defaults.mk
 +++ b/include/kernel-defaults.mk
-@@ -107,7 +107,9 @@
+@@ -102,7 +102,9 @@
  	$(call Kernel/SetInitramfs)
  	rm -rf $(KERNEL_BUILD_DIR)/modules
  	[ -d $(LINUX_DIR)/user_headers ] || $(MAKE) $(KERNEL_MAKEOPTS) INSTALL_HDR_PATH=$(LINUX_DIR)/user_headers headers_install
@@ -17,7 +17,7 @@ Index: b/Config.in
 ===================================================================
 --- a/Config.in
 +++ b/Config.in
-@@ -189,6 +189,12 @@
+@@ -190,6 +190,12 @@
  
  	comment "Kernel build options"
  

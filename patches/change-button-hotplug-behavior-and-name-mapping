@@ -1,7 +1,7 @@
-Index: b/package/gpio-button-hotplug/src/gpio-button-hotplug.c
+Index: b/package/system/gpio-button-hotplug/src/gpio-button-hotplug.c
 ===================================================================
---- a/package/gpio-button-hotplug/src/gpio-button-hotplug.c
-+++ b/package/gpio-button-hotplug/src/gpio-button-hotplug.c
+--- a/package/system/gpio-button-hotplug/src/gpio-button-hotplug.c
++++ b/package/system/gpio-button-hotplug/src/gpio-button-hotplug.c
 @@ -45,6 +45,7 @@
  
  struct bh_priv {
