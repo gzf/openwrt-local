@@ -1,1 +1,1 @@
-Working Revision: svn://svn.openwrt.org/openwrt/trunk/@34200
+svn://svn.openwrt.org/openwrt/trunk
