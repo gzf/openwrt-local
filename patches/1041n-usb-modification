@@ -23,7 +23,7 @@ Index: b/target/linux/ar71xx/generic/profiles/tp-link.mk
 ===================================================================
 --- a/target/linux/ar71xx/generic/profiles/tp-link.mk
 +++ b/target/linux/ar71xx/generic/profiles/tp-link.mk
-@@ -173,7 +173,7 @@
+@@ -183,7 +183,7 @@
  
  define Profile/TLWR1041
  	NAME:=TP-LINK TL-WR1041N
