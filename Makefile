@@ -2,10 +2,10 @@ VPATH = configs
 
 all: config.pub config.local
 
-config.pub: config.core config.luci config.12.09
+config.pub: core luci comp-12.09
 	cat $^ > $@
 
-config.local: config.core config.disable-firewall config.pkgs
+config.local: core disable-firewall local-pkgs
 	cat $^ > $@
 
 clean:
