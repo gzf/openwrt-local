@@ -59,7 +59,7 @@ Index: b/target/linux/ar71xx/image/Makefile
 ===================================================================
 --- a/target/linux/ar71xx/image/Makefile
 +++ b/target/linux/ar71xx/image/Makefile
-@@ -883,6 +883,8 @@
+@@ -887,6 +887,8 @@
  
  $(eval $(call SingleProfile,UBDEV,$(fs_64k),UBDEV01,ubdev01,UBNT-UF,ttyS0,115200,XM,XM,ar7240))
  

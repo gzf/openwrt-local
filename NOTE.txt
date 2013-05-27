@@ -1,1 +1,2 @@
-Branch: svn://svn.openwrt.org/openwrt/branches/attitude_adjustment
+12.09: svn://svn.openwrt.org/openwrt/tags/attitude_adjustment_12.09/
+AA Branch: svn://svn.openwrt.org/openwrt/branches/attitude_adjustment

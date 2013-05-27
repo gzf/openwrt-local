@@ -24,7 +24,7 @@ Index: b/Config.in
 ===================================================================
 --- a/Config.in
 +++ b/Config.in
-@@ -132,6 +132,10 @@
+@@ -139,6 +139,10 @@
  		bool "Select all packages by default"
  		default n
  
