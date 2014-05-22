@@ -15,11 +15,8 @@ CONFIG_PACKAGE_pptpd=m
 
 # storages
 CONFIG_PACKAGE_block-mount=m
-CONFIG_PACKAGE_autofs5=m
-CONFIG_PACKAGE_autofs5-mount-ext2=m
 
 # misc
-CONFIG_PACKAGE_ez-ipupdate-3322=m
 CONFIG_PACKAGE_openldap-server=m
 CONFIG_PACKAGE_openldap-utils=m
 CONFIG_PACKAGE_samba36-server=m
@@ -31,7 +28,6 @@ CONFIG_PACKAGE_wpa-cli=m
 CONFIG_PACKAGE_iperf-mt=m
 CONFIG_PACKAGE_netcat=m
 CONFIG_PACKAGE_rsync=m
-CONFIG_PACKAGE_git=m
 CONFIG_PACKAGE_openssh-client=m
 CONFIG_PACKAGE_wol=m
 CONFIG_PACKAGE_wget=m
@@ -53,3 +49,12 @@ CONFIG_PACKAGE_luci-ssl=m
 CONFIG_PACKAGE_uhttpd-mod-tls=m
 CONFIG_PACKAGE_uhttpd-mod-tls_cyassl=y
 
+# local feeds
+CONFIG_PACKAGE_autofs5=m
+CONFIG_PACKAGE_autofs5-mount-ext2=m
+CONFIG_PACKAGE_git=m
+CONFIG_PACKAGE_git-remote-curl=m
+CONFIG_PACKAGE_git-http-fetch=m
+CONFIG_PACKAGE_git-http-push=m
+CONFIG_PACKAGE_ez-ipupdate-3322=m
+CONFIG_PACKAGE_incron=m
