@@ -3,3 +3,14 @@ AA Branch: svn://svn.openwrt.org/openwrt/branches/attitude_adjustment
 
 CentOS 6 build prerequisite: 
 	gettext flex bison gcc gcc-c++ perl-ExtUtils-MakeMaker zlib-devel ncurses-devel
+
+Build steps:
+* merge feeds
+* create symlinks (dl,patches)
+* ./scripts/feeds update -a
+* quilt push -a
+* ./scripts/feeds update -i
+* ./scripts/feeds install -a
+* copy and edit config
+* make defconfig or make menuconfig
+* make
