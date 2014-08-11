@@ -7,11 +7,19 @@ CONFIG_PACKAGE_ebtables-utils=m
 CONFIG_PACKAGE_arptables=m
 CONFIG_PACKAGE_iptables-mod-nat-extra=m
 
-# VPN
+# VPN/Tunnel/Proxy
 CONFIG_PACKAGE_openvpn=m
 CONFIG_PACKAGE_n2n=m
 CONFIG_PACKAGE_ppp-mod-pptp=m
 CONFIG_PACKAGE_pptpd=m
+CONFIG_PACKAGE_xl2tpd=m
+CONFIG_PACKAGE_openl2tp-full=m
+CONFIG_PACKAGE_openl2tp-mini=m
+CONFIG_PACKAGE_openswan=m
+CONFIG_PACKAGE_strongswan-full=m
+CONFIG_PACKAGE_strongswan-default=m
+CONFIG_PACKAGE_strongswan-minimal=m
+CONFIG_PACKAGE_shadowsocks-libev=m
 
 # storages
 CONFIG_PACKAGE_block-mount=m
@@ -39,7 +47,6 @@ CONFIG_PACKAGE_NTFS-3G_USE_LIBFUSE=y
 CONFIG_PACKAGE_relayd=m
 CONFIG_PACKAGE_msmtp=m
 CONFIG_PACKAGE_mercurial=m
-CONFIG_PACKAGE_shadowsocks-libev=m
 
 # luci and https
 CONFIG_PACKAGE_luci=m
