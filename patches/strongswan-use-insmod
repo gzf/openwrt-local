@@ -7,7 +7,7 @@ Index: b/feeds/packages/net/strongswan/patches/201-kmodloader.patch
   		{
  -			ignore_result(system("modprobe -qv af_key"));
 -+			ignore_result(system("modprobe af_key 2>&1 >/dev/null"));
-++			ignore_result(system("insmod af_key 2>&1 >/dev/null"));
+++			ignore_result(system("insmod af_key &>/dev/null"));
   		}
   
   		/* now test again */
@@ -20,11 +20,11 @@ Index: b/feeds/packages/net/strongswan/patches/201-kmodloader.patch
 -+		ignore_result(system("modprobe ipcomp 2>&1 >/dev/null"));
 -+		ignore_result(system("modprobe xfrm4_tunnel 2>&1 >/dev/null"));
 -+		ignore_result(system("modprobe xfrm_user 2>&1 >/dev/null"));
-++		ignore_result(system("insmod ah4 2>&1 >/dev/null"));
-++		ignore_result(system("insmod esp4 2>&1 >/dev/null"));
-++		ignore_result(system("insmod ipcomp 2>&1 >/dev/null"));
-++		ignore_result(system("insmod xfrm4_tunnel 2>&1 >/dev/null"));
-++		ignore_result(system("insmod xfrm_user 2>&1 >/dev/null"));
+++		ignore_result(system("insmod ah4 &>/dev/null"));
+++		ignore_result(system("insmod esp4 &>/dev/null"));
+++		ignore_result(system("insmod ipcomp &>/dev/null"));
+++		ignore_result(system("insmod xfrm4_tunnel &>/dev/null"));
+++		ignore_result(system("insmod xfrm_user &>/dev/null"));
   	}
   
   	DBG2(DBG_APP, "found netkey IPsec stack");
