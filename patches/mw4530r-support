@@ -26,8 +26,8 @@ Index: b/target/linux/ar71xx/base-files/lib/ar71xx.sh
  	esac
  
  	case "$machine" in
--	*TL-WR* | *TL-WA* | *TL-MR*)
-+	*TL-WR* | *TL-WA* | *TL-MR* | Mercury*MW* )
+-	*TL-WR* | *TL-WA* | *TL-MR* | *TL-WD*)
++	*TL-WR* | *TL-WA* | *TL-MR* | *TL-WD* | Mercury*MW*)
  		tplink_board_detect "$machine"
  		;;
  	esac

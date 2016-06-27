@@ -1,5 +1,4 @@
-12.09: svn://svn.openwrt.org/openwrt/tags/attitude_adjustment_12.09/
-AA Branch: svn://svn.openwrt.org/openwrt/branches/attitude_adjustment
+Source: git://git.openwrt.org/12.09/openwrt.git
 
 CentOS 6 build prerequisite: 
 	gettext flex bison gcc gcc-c++ zlib-devel ncurses-devel quilt \

@@ -1,13 +1,19 @@
-Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
+Index: b/package/mac80211/patches/849-b43-led-configuration-param.patch
 ===================================================================
 --- /dev/null
-+++ b/package/mac80211/patches/840-b43-led-configuration-param.patch
-@@ -0,0 +1,445 @@
++++ b/package/mac80211/patches/849-b43-led-configuration-param.patch
+@@ -0,0 +1,451 @@
 +Index: b/drivers/net/wireless/b43/leds.c
 +===================================================================
 +--- a/drivers/net/wireless/b43/leds.c
 ++++ b/drivers/net/wireless/b43/leds.c
-+@@ -30,6 +30,9 @@
++@@ -26,10 +26,15 @@
++ 
++ */
++ 
+++#include <linux/moduleparam.h>
+++
++ #include "b43.h"
 + #include "leds.h"
 + #include "rfkill.h"
 + 
@@ -17,7 +23,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 
 + static void b43_led_turn_on(struct b43_wldev *dev, u8 led_index,
 + 			    bool activelow)
-+@@ -87,6 +90,7 @@
++@@ -87,6 +92,7 @@
 + 
 + static void b43_leds_work(struct work_struct *work)
 + {
@@ -25,7 +31,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 	struct b43_leds *leds = container_of(work, struct b43_leds, work);
 + 	struct b43_wl *wl = container_of(leds, struct b43_wl, leds);
 + 	struct b43_wldev *dev;
-+@@ -96,10 +100,8 @@
++@@ -96,10 +102,8 @@
 + 	if (unlikely(!dev || b43_status(dev) < B43_STAT_STARTED))
 + 		goto out_unlock;
 + 
@@ -38,7 +44,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 
 + out_unlock:
 + 	mutex_unlock(&wl->mutex);
-+@@ -118,20 +120,24 @@
++@@ -118,20 +122,24 @@
 + 	}
 + }
 + 
@@ -68,7 +74,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 	atomic_set(&led->state, 0);
 + 
 + 	led->led_dev.name = led->name;
-+@@ -140,11 +146,12 @@
++@@ -140,11 +148,12 @@
 + 
 + 	err = led_classdev_register(dev->dev->dev, &led->led_dev);
 + 	if (err) {
@@ -82,7 +88,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 	return 0;
 + }
 + 
-+@@ -156,173 +163,135 @@
++@@ -156,173 +165,135 @@
 + 	led->wl = NULL;
 + }
 + 
@@ -347,7 +353,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + }
 + 
 + void b43_leds_stop(struct b43_wldev *dev)
-+@@ -333,27 +302,40 @@
++@@ -333,27 +304,40 @@
 + 	cancel_work_sync(&leds->work);
 + }
 + 
@@ -432,7 +438,7 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 +===================================================================
 +--- a/drivers/net/wireless/b43/main.c
 ++++ b/drivers/net/wireless/b43/main.c
-+@@ -2423,11 +2423,14 @@
++@@ -2472,11 +2472,14 @@
 + 	if (!modparam_qos || dev->fw.opensource)
 + 		wl->hw->queues = 1;
 + 
@@ -445,6 +451,6 @@ Index: b/package/mac80211/patches/840-b43-led-configuration-param.patch
 + 		goto err_one_core_detach;
 + 	wl->hw_registred = true;
 +-	b43_leds_register(wl->current_dev);
-+ 	goto out;
 + 
-+ err_one_core_detach:
++ 	/* Register HW RNG driver */
++ 	b43_rng_init(wl);
