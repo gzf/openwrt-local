@@ -1,0 +1,27 @@
+Index: b/feeds/packages/mail/msmtp/Makefile
+===================================================================
+--- a/feeds/packages/mail/msmtp/Makefile
++++ b/feeds/packages/mail/msmtp/Makefile
+@@ -9,12 +9,12 @@
+ include $(TOPDIR)/rules.mk
+ 
+ PKG_NAME:=msmtp
+-PKG_VERSION:=1.4.27
++PKG_VERSION:=1.4.32
+ PKG_RELEASE:=1
+ 
+ PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.bz2
+ PKG_SOURCE_URL:=@SF/msmtp
+-PKG_MD5SUM:=2d6d10d9c59ed2b2635554ed35fb9226
++PKG_MD5SUM:=aa60e22211118f222470439cea60f795
+ 
+ PKG_FIXUP:=autoreconf
+ PKG_INSTALL:=1
+@@ -28,6 +28,7 @@
+   CATEGORY:=Mail
+   TITLE:=Simple sendmail SMTP forwarding
+   URL:=http://msmtp.sourceforge.net/
++  DEPENDS+= +libintl
+ endef
+ 
+ define Package/msmtp/Default/description

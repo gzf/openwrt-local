@@ -16,3 +16,4 @@ add-bcm63xx-profile-with-usb-hci-drivers
 busybox-setuid
 strongswan-use-insmod
 fix-duplicated-series-entries
+pkg-msmtp-upgrade
