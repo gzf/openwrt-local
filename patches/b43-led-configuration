@@ -438,7 +438,7 @@ Index: b/package/mac80211/patches/849-b43-led-configuration-param.patch
 +===================================================================
 +--- a/drivers/net/wireless/b43/main.c
 ++++ b/drivers/net/wireless/b43/main.c
-+@@ -2472,11 +2472,14 @@
++@@ -2423,11 +2423,14 @@
 + 	if (!modparam_qos || dev->fw.opensource)
 + 		wl->hw->queues = 1;
 + 
@@ -451,6 +451,6 @@ Index: b/package/mac80211/patches/849-b43-led-configuration-param.patch
 + 		goto err_one_core_detach;
 + 	wl->hw_registred = true;
 +-	b43_leds_register(wl->current_dev);
++ 	goto out;
 + 
-+ 	/* Register HW RNG driver */
-+ 	b43_rng_init(wl);
++ err_one_core_detach:
