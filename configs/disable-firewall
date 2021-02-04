@@ -1,3 +1,0 @@
-# disable the buildin firewall package
-# CONFIG_PACKAGE_firewall is not set
-

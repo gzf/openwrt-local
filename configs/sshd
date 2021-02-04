@@ -1,4 +1,0 @@
-# use openssh rather than dropbear
-# CONFIG_PACKAGE_dropbear is not set
-CONFIG_PACKAGE_openssh-server=y
-CONFIG_PACKAGE_openssh-keygen=y
