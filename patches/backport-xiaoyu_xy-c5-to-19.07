@@ -1,0 +1,145 @@
+Index: b/target/linux/ramips/base-files/etc/board.d/02_network
+===================================================================
+--- a/target/linux/ramips/base-files/etc/board.d/02_network
++++ b/target/linux/ramips/base-files/etc/board.d/02_network
+@@ -125,6 +125,7 @@
+ 	whr-g300n|\
+ 	mqmaker,witi-256m|\
+ 	mqmaker,witi-512m|\
++    xiaoyu,xy-c5|\
+ 	youku-yk1|\
+ 	youku,yk-l2|\
+ 	zbt-ape522ii|\
+Index: b/target/linux/ramips/image/mt7621.mk
+===================================================================
+--- a/target/linux/ramips/image/mt7621.mk
++++ b/target/linux/ramips/image/mt7621.mk
+@@ -597,6 +597,14 @@
+ endef
+ TARGET_DEVICES += wndr3700v5
+ 
++define Device/xiaoyu_xy-c5
++  DTS := XY-C5
++  IMAGE_SIZE := $(ralink_default_fw_size_32M)
++  DEVICE_TITLE := XiaoYu XY-C5
++  DEVICE_PACKAGES := kmod-ata-core kmod-ata-ahci kmod-usb3
++endef
++TARGET_DEVICES += xiaoyu_xy-c5
++
+ define Device/youhua_wr1200js
+   DTS := WR1200JS
+   IMAGE_SIZE := 16064k
+Index: b/target/linux/ramips/dts/XY-C5.dts
+===================================================================
+--- /dev/null
++++ b/target/linux/ramips/dts/XY-C5.dts
+@@ -0,0 +1,109 @@
++/dts-v1/;
++
++#include "mt7621.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++    compatible = "xiaoyu,xy-c5", "mediatek,mt7621-soc";
++    model = "XY-C5";
++
++    aliases {
++        led-boot = &led_sys;
++        led-failsafe = &led_sys;
++        led-running = &led_sys;
++        led-upgrade = &led_sys;
++    };
++
++    chosen {
++        bootargs = "console=ttyS0,115200";
++    };
++
++    leds {
++        compatible = "gpio-leds";
++
++        power {
++            label = "xy-c5:green:work";
++            gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
++        };
++
++        led_sys: sys {
++            label = "xy-c5:green:sys";
++            gpios = <&gpio0 7 GPIO_ACTIVE_LOW>;
++        };
++
++    };
++
++    keys {
++        compatible = "gpio-keys-polled";
++        poll-interval = <20>;
++
++        reset {
++            label = "reset";
++            gpios = <&gpio0 18 GPIO_ACTIVE_LOW>;
++            linux,code = <KEY_RESTART>;
++        };
++    };
++
++
++};
++
++
++&spi0 {
++    status = "okay";
++
++    m25p80@0 {
++        compatible = "jedec,spi-nor";
++        reg = <0>;
++        spi-max-frequency = <25000000>;
++
++        partitions {
++            compatible = "fixed-partitions";
++            #address-cells = <1>;
++            #size-cells = <1>;
++
++            partition@0 {
++                label = "u-boot";
++                reg = <0x0 0x30000>;
++                read-only;
++            };
++
++            partition@30000 {
++                label = "u-boot-env";
++                reg = <0x30000 0x10000>;
++                read-only;
++            };
++
++            factory: partition@40000 {
++                label = "factory";
++                reg = <0x40000 0x10000>;
++                read-only;
++            };
++
++            partition@50000 {
++                compatible = "denx,uimage";
++                label = "firmware";
++                reg = <0x50000 0x1fb0000>;
++            };
++        };
++    };
++};
++
++&pcie {
++    status = "okay";
++};
++
++&ethernet {
++    mtd-mac-address = <&factory 0xe000>;
++};
++
++&pinctrl {
++    state_default: pinctrl0 {
++        gpio {
++            ralink,group = "wdt", "rgmii2", "jtag", "mdio";
++            ralink,function = "gpio";
++        };
++    };
++};
++
