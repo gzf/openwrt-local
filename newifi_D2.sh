@@ -1,5 +1,4 @@
-make image PROFILE=xiaomi_mir3p \
+make image PROFILE=d-team_newifi-d2 \
     PACKAGES="-odhcpd-ipv6only -iptables -ip6tables -firewall -kmod-ipt-offload -ppp -ppp-mod-pppoe \
-              -kmod-usb-ledtrig-usbport \
               vim \
               kmod-usb-storage-uas kmod-fs-autofs4 kmod-fs-ext4"
